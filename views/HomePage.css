@@ -1,0 +1,85 @@
+.btn-1{
+    color: white;
+    background: none;
+    padding: 5px;
+    border: none;
+}
+
+.btn-1:hover{
+  color: yellow;
+}
+
+.header-color{
+    background-color: rgba(36, 41, 67, .8666666667);
+}
+
+.text-color{
+    color: white;
+    font-size: 25px;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  @media (max-width: 767.98px) {
+    header {
+      flex-direction: column;
+      align-items: center;
+    }
+  
+    .d-flex {
+      display: flex;
+      justify-content: center;
+      width: 100%;
+    }
+  
+    .text-end {
+      margin-top: 1rem;
+    }
+  }
+
+.card-btn{
+  padding: 5px;
+  background-color: rgba(36, 41, 67, .8666666667);
+  border: 1px solid black;
+  border-radius: 5px;
+  color: white;
+  font-style: none;
+  margin-top: 10px;
+}
+
+.card-btn:hover{
+  padding: 5px;
+  background-color: rgba(36, 41, 67, .8666666667);
+  border: 1px solid black;
+  border-radius: 5px;
+  color: yellow;
+  font-style: none;
+}
+
+.hero-container{
+  background-color: rgb(255, 238, 214);
+  height: 100vh;
+  width: 100%;
+  text-align: center;
+  overflow: hidden;
+}
+
+body {
+  margin: 0; /* Eltávolítja a böngésző alapértelmezett margóját */
+  overflow: hidden; /* Eltünteti a görgetősávot */
+  display: flex;
+  flex-direction: column;
+  height: 100vh; /* Teljes magasság */
+}
+
+.footer-container {
+  background-color: rgb(255, 238, 214);
+  width: 100%;
+  display: flex; /* Középre igazítja a tartalmat */
+  justify-content: center;
+  align-items: center; /* Függőlegesen középre igazít */
+}
