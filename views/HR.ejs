@@ -24,52 +24,70 @@
             <!-- Első oszlop -->
             <div class="col-md-4 checkbox-column">
                 <div class="form-check">
-                    <label for="vezeteknev">Vezetéknév</label>
-                    <input type="checkbox" class="form-check-input" id="vezeteknev" name="checkbox" value="vezeteknev">
+                    <label for="name">Név</label>
+                    <input type="checkbox" class="form-check-input" id="name" name="checkbox" value="vezeteknev">
                 </div>
-                <div class="form-check">
+                <!-- <div class="form-check">
                     <label for="keresztnev">Keresztnév</label>
                     <input type="checkbox" class="form-check-input" id="keresztnev" name="checkbox" value="keresztnev">
+                </div> -->
+                <div class="form-check">
+                    <label for="birthname">Születési név</label>
+                    <input type="checkbox" class="form-check-input" id="birthname" name="checkbox" value="szul_nev">
                 </div>
                 <div class="form-check">
-                    <label for="szul_nev">Születési név</label>
-                    <input type="checkbox" class="form-check-input" id="szul_nev" name="checkbox" value="szul_nev">
+                    <label for="mothers_name">Anyja neve</label>
+                    <input type="checkbox" class="form-check-input" id="mothers_name" name="checkbox" value="anyja_neve">
                 </div>
                 <div class="form-check">
-                    <label for="anyja_neve">Anyja neve</label>
-                    <input type="checkbox" class="form-check-input" id="anyja_neve" name="checkbox" value="anyja_neve">
-                </div>
-                <div class="form-check">
-                    <label for="szul_hely">Születési hely</label>
-                    <input type="checkbox" class="form-check-input" id="szul_hely" name="checkbox" value="szul_hely">
+                    <label for="birthplace">Születési hely</label>
+                    <input type="checkbox" class="form-check-input" id="birthplace" name="checkbox" value="szul_hely">
                 </div>
             </div>
 
             <!-- Második oszlop -->
             <div class="col-md-4 checkbox-column">
                 <div class="form-check">
-                    <label for="szul_datum">Születési dátum</label>
-                    <input type="checkbox" class="form-check-input" id="szul_datum" name="checkbox" value="szul_datum">
+                    <label for="birthdate">Születési dátum</label>
+                    <input type="checkbox" class="form-check-input" id="birth_date" name="checkbox" value="szul_datum">
                 </div>
                 <div class="form-check">
-                    <label for="neptun_id">Neptun azonosító</label>
-                    <input type="checkbox" class="form-check-input" id="neptun_id" name="checkbox" value="neptun_id">
+                    <label for="id_number">Személyi szám</label>
+                    <input type="checkbox" class="form-check-input" id="id_number" name="checkbox" value="neptun_id">
                 </div>
                 <div class="form-check">
-                    <label for="ertesitesi_email">Értesítési e-mail cím</label>
-                    <input type="checkbox" class="form-check-input" id="ertesitesi_email" name="checkbox" value="ertesitesi_email">
+                    <label for="email_sze">Értesítési e-mail cím</label>
+                    <input type="checkbox" class="form-check-input" id="email_sze" name="checkbox" value="ertesitesi_email">
                 </div>
                 <div class="form-check">
-                    <label for="ertesitesi_telefon">Értesítési telefonszám</label>
-                    <input type="checkbox" class="form-check-input" id="ertesitesi_telefon" name="checkbox" value="ertesitesi_telefon">
+                    <label for="phone_number">Értesítési telefonszám</label>
+                    <input type="checkbox" class="form-check-input" id="phone_number" name="checkbox" value="ertesitesi_telefon">
                 </div>
-                <div class="form-check">
+                <!-- <div class="form-check">
                     <label for="hallgato_jogviszony">Hallgatói jogviszony</label>
                     <input type="checkbox" class="form-check-input" id="hallgato_jogviszony" name="checkbox" value="hallgato_jogviszony">
-                </div>
+                </div> -->
             </div>
         </div>
     </div>
+    <button type="button" class="btn btn-primary" onclick="generateArray()">Generate Array</button>
+    <script>
+        function generateArray() {
+            const checkboxes = document.querySelectorAll('input[name="checkbox"]:checked');
+            const checkedIds = Array.from(checkboxes).map(checkbox => checkbox.id);
+            const querrystr = 'select ' + checkedIds.join(', ') + ' from co_workers';
+            console.log(querrystr);
+            fetch('/submit-string',{
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'text/plain',
+                },
+                body: querrystr, // Send as string
+            })
+            }
+        
+
+    </script>
 
     <div class="footer-container">
         <% const date = new Date(); %>
