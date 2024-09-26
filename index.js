@@ -5,6 +5,7 @@ import * as XLSX from 'xlsx/xlsx.mjs';
 import fs from "fs";
 import path from "path";
 import ExcelJS from "exceljs";
+import multer from "multer";
 
 const app = express();
 const port = 3000;
@@ -13,6 +14,8 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.text());
 app.use(express.static("views"));
+app.use(express.static("public"));
+app.use(express.urlencoded({ extended: true}));
 
 
 const db = new pg.Client({
@@ -24,6 +27,32 @@ const db = new pg.Client({
   });
 
 db.connect();
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+      cb(null, 'uploads/'); // The folder where files will be stored
+  },
+  filename: function (req, file, cb) {
+      const customFileName = req.body.customFileName || file.fieldname + '-' + Date.now(); // Use custom name or fallback
+      const fileExtension = path.extname(file.originalname); // Extract the file extension
+      cb(null, customFileName + fileExtension); // Append the file extension
+  }
+});
+
+// Initialize multer with storage settings
+const upload = multer({ storage: storage });
+
+// Route to handle file upload
+app.post('/upload', upload.single('file'), (req, res) => {
+  if (!req.file) {
+      return res.status(400).send('No file uploaded.');
+  }
+  res.send(`File uploaded: ${req.file.filename}`);
+});
+
+app.get('/uploadxls', async (req, res) => {
+  res.render('Upload.ejs');
+});
 
 // API végpont a diákokhoz
 app.get('/api/students', async (req, res) => {
