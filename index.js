@@ -7,6 +7,7 @@ import path from "path";
 import ExcelJS from "exceljs";
 import multer from "multer";
 
+
 const app = express();
 const port = 3000;
 
@@ -47,7 +48,8 @@ app.post('/upload', upload.single('file'), (req, res) => {
   if (!req.file) {
       return res.status(400).send('No file uploaded.');
   }
-  res.send(`File uploaded: ${req.file.filename}`);
+  res.render('Upload.ejs');
+  alert("Noice!!");
 });
 
 app.get('/uploadxls', async (req, res) => {
