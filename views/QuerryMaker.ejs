@@ -17,12 +17,13 @@
             <button type="button" class="btn-1 text-color">Felhasználó</button>
         </div>
     </header>
-    <h1>Select Table and Columns</h1>
+    <div  style="margin: 10px;">
+    <h1>Lekérdezés készítő</h1>
 
     <!-- Dropdown for selecting a table -->
-    <label for="tableSelect">Select a table:</label>
+    <label for="tableSelect">Válasszon táblát:</label>
     <select id="tableSelect" onchange="onTableChange()">
-        <option value="">-- Select a table --</option>
+        <option value="">-- kiválasztott tábla --</option>
         <% 
         // Use a Set to track unique table names
         let tableNames = new Set();
@@ -40,7 +41,7 @@
     
     <% tableNames.forEach(function(tableName) { %>
         <div id="<%= tableName %>-columns" class="columns" style="display: none;">
-            <h2>Columns in <%= tableName %>:</h2>
+            <h2><%= tableName %> tábla oszlopai:</h2>
             <% tablesAndColumns.forEach(function(row) { 
                 if (row.table_name === tableName) { %>
                     <input type="checkbox" id="<%= row.column_name %>" name="<%= row.column_name %>">
@@ -50,8 +51,9 @@
         </div>
     <% }); %>
 
-    <button type="button" class="btn btn-primary" onclick="generateArray()">Generate Array</button>
+    <button type="button" class="btn btn-primary" onclick="generateArray()">Excel tábla generálás</button>
 
+    </div>
     <script>
         function onTableChange() {
             const selectedTable = document.getElementById("tableSelect").value;

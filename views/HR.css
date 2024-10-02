@@ -60,6 +60,7 @@ body {
   display: flex;
   flex-direction: column;
   height: 100vh; /* Teljes magasság */
+  background-color: rgb(255, 238, 214);
 }
 
 /* Lábjegyzet (footer) */
@@ -70,6 +71,8 @@ body {
   justify-content: center;
   align-items: center;
   padding: 20px 0;
+  position: fixed;
+  bottom:10px;
 }
 
 /* Checkbox formázás */

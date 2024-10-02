@@ -45,8 +45,6 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 function xlsxToMatrix(filePath) {
-  console.log(`Attempting to read file: ${filePath}`);
-
   // Check if the file exists before trying to read it
   if (fs.existsSync(filePath)) {
       try {
@@ -68,6 +66,21 @@ function xlsxToMatrix(filePath) {
       console.error(`File does not exist at path: ${filePath}`);
       throw new Error(`File does not exist at path: ${filePath}`);
   }
+}
+
+function matrixToHTMLTable(matrix) {
+  let table = '<table border="1" cellpadding="5" cellspacing="0">';
+
+  matrix.forEach((row) => {
+      table += '<tr>';
+      row.forEach((cell) => {
+          table += `<td>${cell}</td>`;
+      });
+      table += '</tr>';
+  });
+
+  table += '</table>';
+  return table;
 }
 
 async function createTableFromMatrix(matrix, tableName) {
@@ -93,8 +106,6 @@ async function createTableFromMatrix(matrix, tableName) {
 
   const flatValues = values.flat();  // Flatten the 2D array into a 1D array for parameterized query
   const finalInsertSQL = insertSQL + valuesPlaceholder;
-
-  console.log('Inserting data with SQL:', finalInsertSQL);
 
   // Execute the INSERT query
   await db.query(finalInsertSQL, flatValues);
@@ -137,7 +148,7 @@ async function printToXls(querrystr) {
 };
 
 // Route to handle file upload
-app.post('/upload', upload.single('file'), (req, res) => {
+app.post('/uploadfile', upload.single('file'), (req, res) => {
   if (!req.file) {
       return res.status(400).send('No file uploaded or invalid file type.');
   }
@@ -151,7 +162,36 @@ app.post('/upload', upload.single('file'), (req, res) => {
 
       try {
           const matrix = xlsxToMatrix(filePath);
-          res.send(matrix);
+          const htmlTable = matrixToHTMLTable(matrix);
+
+          // Send the HTML response with the table
+          res.send(`
+            <html>
+              <head>
+                <title>Matrix Table</title>
+                <style>
+              .home-button {
+                margin: 20px;
+                display: inline-block;
+                padding: 10px 20px;
+                background-color: #007bff;
+                color: white;
+                text-decoration: none;
+                border-radius: 5px;
+              }
+
+              .home-button:hover {
+                background-color: #0056b3;
+              }
+            </style>
+              </head>
+              <body>
+                <a href="/homepage" class="home-button">Vissza a főoldalra</a>
+                <br>
+                ${htmlTable} <!-- Insert the table here -->
+              </body>
+            </html>
+          `);
           createTableFromMatrix(matrix, req.file.filename.replace('.xlsx', ''));
       } catch (error) {
           res.status(500).send('Error processing the Excel file.');
@@ -160,7 +200,7 @@ app.post('/upload', upload.single('file'), (req, res) => {
 });
 
 
-app.get('/uploadxls', async (req, res) => {
+app.get('/upload', async (req, res) => {
   res.render('Upload.ejs');
 });
 
