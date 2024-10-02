@@ -121,9 +121,7 @@ const getTablesAndColumns = async () => {
 async function printToXls(querrystr) {
   const workbook = new ExcelJS.Workbook();
   const worksheet = workbook.addWorksheet('Query Results');
-  console.log(querrystr,'ez maar a funcon belul');
   const res = await db.query(querrystr); // Replace with your actual query
-  console.log(res.rows);  // Print the results to the console for debugging
   const columns = Object.keys(res.rows[0]).map(key => ({ header: key, key }));
   worksheet.columns = columns;
 
@@ -202,7 +200,6 @@ app.get('/hr', async (req, res) => {
   
 app.post('/submit-string', (req, res) => {
   const receivedString = req.body;  // Get the string from the form
-  console.log('Received string: in the console', receivedString);
   printToXls(receivedString);  // Use the received string to generate an XLS file
 });
 

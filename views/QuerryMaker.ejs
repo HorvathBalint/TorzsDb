@@ -73,7 +73,6 @@
             const checkedIds = Array.from(checkboxes).map(checkbox => checkbox.id);
             var tableName = document.getElementById("tableSelect").value;
             const querrystr = 'select ' + checkedIds.join(', ') + ' from '+ tableName;
-            console.log(querrystr);
             fetch('/submit-string',{
                 method: 'POST',
                 headers: {
