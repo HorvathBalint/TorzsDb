@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="/HR.css">
+    <title>Lekérdezés generáló</title>
+</head>
+<body>
+    <header class="d-flex flex-wrap justify-content-center py-3 border-bottom container-fluid header-color header">
+        <a href="/homepage" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-dark text-decoration-none">
+            <img src="icon-1.png" width="55" height="70" class="p-2"/>
+            <span class="text-color">Törzsadatbázis</span>
+        </a>
+        <div class="text-end">
+            <button type="button" class="btn-1 text-color">Felhasználó</button>
+        </div>
+    </header>
+    <h1>Select Table and Columns</h1>
+
+    <!-- Dropdown for selecting a table -->
+    <label for="tableSelect">Select a table:</label>
+    <select id="tableSelect" onchange="onTableChange()">
+        <option value="">-- Select a table --</option>
+        <% 
+        // Use a Set to track unique table names
+        let tableNames = new Set();
+        tablesAndColumns.forEach(function(row) { 
+            tableNames.add(row.table_name);
+        });
+        // Render the table names in the dropdown
+        tableNames.forEach(function(tableName) { 
+        %>
+            <option value="<%= tableName %>"><%= tableName %></option>
+        <% }); %>
+    </select>
+
+    <br><br>
+    
+    <% tableNames.forEach(function(tableName) { %>
+        <div id="<%= tableName %>-columns" class="columns" style="display: none;">
+            <h2>Columns in <%= tableName %>:</h2>
+            <% tablesAndColumns.forEach(function(row) { 
+                if (row.table_name === tableName) { %>
+                    <input type="checkbox" id="<%= row.column_name %>" name="<%= row.column_name %>">
+                    <label for="<%= row.column_name %>"><%= row.column_name %></label><br>
+            <% }
+            }); %>
+        </div>
+    <% }); %>
+
+    <button type="button" class="btn btn-primary" onclick="generateArray()">Generate Array</button>
+
+    <script>
+        function onTableChange() {
+            const selectedTable = document.getElementById("tableSelect").value;
+            const columnDivs = document.querySelectorAll(".columns");
+
+            // Hide all columns initially
+            columnDivs.forEach(div => {
+                div.style.display = "none";
+            });
+
+            // Show columns for the selected table
+            if (selectedTable) {
+                document.getElementById(selectedTable + "-columns").style.display = "block";
+            }
+        }
+
+        function generateArray() {
+            const checkboxes = document.querySelectorAll('input[type="checkbox"]:checked');
+            const checkedIds = Array.from(checkboxes).map(checkbox => checkbox.id);
+            var tableName = document.getElementById("tableSelect").value;
+            const querrystr = 'select ' + checkedIds.join(', ') + ' from '+ tableName;
+            console.log(querrystr);
+            fetch('/submit-string',{
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'text/plain',
+                },
+                body: querrystr, // Send as string
+            })
+            }
+    </script>
+
+    <div class="footer-container">
+        <% const date = new Date(); %>
+        <% const year = date.getFullYear(); %>
+        <p>&copy; <%= year %> Minden jog fenntartva.</p>
+    </div>
+
+</body>
+</html>

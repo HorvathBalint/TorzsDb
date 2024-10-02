@@ -52,17 +52,13 @@ function xlsxToMatrix(filePath) {
       try {
           // Attempt to read the workbook
           const workbook = xlsx.readFile(filePath);
-          console.log('Workbook successfully read.');
-
-          // Check if the workbook has any sheets
           const sheetName = workbook.SheetNames[0];
           if (!sheetName) {
               throw new Error('No sheets found in the Excel file.');
           }
-
+          
           const worksheet = workbook.Sheets[sheetName];
           const matrix = xlsx.utils.sheet_to_json(worksheet, { header: 1 });
-          console.log('Sheet successfully converted to matrix.');
           return matrix;
       } catch (error) {
           console.error(`Error reading the Excel file: ${error.message}`);
@@ -82,8 +78,6 @@ async function createTableFromMatrix(matrix, tableName) {
   let createTableSQL = `CREATE TABLE ${tableName} (\n`;
   createTableSQL += columnNames.map(col => `"${col}" TEXT`).join(',\n');
   createTableSQL += '\n);';
-
-  console.log('Creating table with SQL:', createTableSQL);
 
   // Execute the CREATE TABLE query
   await db.query(createTableSQL);
@@ -105,6 +99,44 @@ async function createTableFromMatrix(matrix, tableName) {
   // Execute the INSERT query
   await db.query(finalInsertSQL, flatValues);
 }
+
+const getTablesAndColumns = async () => {
+  const query = `
+      SELECT 
+          table_name, 
+          column_name
+      FROM information_schema.columns
+      WHERE table_schema = 'public'
+      ORDER BY table_name, ordinal_position;
+  `;
+  
+  try {
+      const res = await db.query(query);
+      return res.rows; // returns an array of objects { table_name: '', column_name: '' }
+  } catch (err) {
+      console.error(err);
+  }
+};
+
+async function printToXls(querrystr) {
+  const workbook = new ExcelJS.Workbook();
+  const worksheet = workbook.addWorksheet('Query Results');
+  console.log(querrystr,'ez maar a funcon belul');
+  const res = await db.query(querrystr); // Replace with your actual query
+  console.log(res.rows);  // Print the results to the console for debugging
+  const columns = Object.keys(res.rows[0]).map(key => ({ header: key, key }));
+  worksheet.columns = columns;
+
+  // Add rows to the Excel sheet
+  res.rows.forEach(row => {
+      worksheet.addRow(row);
+  });
+  let trimmedStr = querrystr.trim();
+  let words = trimmedStr.split(" ");
+
+  // Write the Excel file
+  await workbook.xlsx.writeFile('querry from '+words[words.length-1]+".xlsx");
+};
 
 // Route to handle file upload
 app.post('/upload', upload.single('file'), (req, res) => {
@@ -159,32 +191,14 @@ app.get('/homepage', async (req, res) => {
   res.render('HomePage.ejs');
 });
 
-app.get('/test', async (req, res) => {
-  res.render('TEST.ejs');
+app.get('/QM', async (req, res) => {
+  const tablesAndColumns = await getTablesAndColumns();
+  res.render('QuerryMaker', { tablesAndColumns });
 });
 
 app.get('/hr', async (req, res) => {
   res.render('HR.ejs');
 });
-
-async function printToXls(querrystr) {
-  const workbook = new ExcelJS.Workbook();
-  const worksheet = workbook.addWorksheet('Query Results');
-  console.log(querrystr,'ez maar a funcon belul');
-  const res = await db.query(querrystr); // Replace with your actual query
-  console.log(res.rows);  // Print the results to the console for debugging
-  const columns = Object.keys(res.rows[0]).map(key => ({ header: key, key }));
-  worksheet.columns = columns;
-
-  // Add rows to the Excel sheet
-  res.rows.forEach(row => {
-      worksheet.addRow(row);
-  });
-
-  // Write the Excel file
-  await workbook.xlsx.writeFile("first.xlsx");
-}
-
   
 app.post('/submit-string', (req, res) => {
   const receivedString = req.body;  // Get the string from the form
