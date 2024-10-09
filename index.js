@@ -57,6 +57,7 @@ function xlsxToMatrix(filePath) {
           
           const worksheet = workbook.Sheets[sheetName];
           const matrix = xlsx.utils.sheet_to_json(worksheet, { header: 1 });
+          fs.unlinkSync(filePath);
           return matrix;
       } catch (error) {
           console.error(`Error reading the Excel file: ${error.message}`);
@@ -83,33 +84,42 @@ function matrixToHTMLTable(matrix) {
   return table;
 }
 
-async function createTableFromMatrix(matrix, tableName) {
+async function createOrUpsertTableFromMatrix(matrix, tableName, uniqueColumn) {
   // Get column names from the first row
   const columnNames = matrix[0];
+  uniqueColumn=matrix[0][0];
 
-  // Build the CREATE TABLE statement dynamically
-  let createTableSQL = `CREATE TABLE ${tableName} (\n`;
-  createTableSQL += columnNames.map(col => `"${col}" TEXT`).join(',\n');
-  createTableSQL += '\n);';
-
-  // Execute the CREATE TABLE query
-  await db.query(createTableSQL);
-
-  // Insert rows into the table
-  const insertSQL = `INSERT INTO ${tableName} (${columnNames.map(col => `"${col}"`).join(',')}) VALUES \n`;
-
-  // Build the VALUES portion of the INSERT statement
-  const values = matrix.slice(1); // Remove the first row (headers)
-  const valuesPlaceholder = values.map((row, rowIndex) => 
-      `(${row.map((_, colIndex) => `$${rowIndex * row.length + colIndex + 1}`).join(', ')})`
-  ).join(',\n');
-
-  const flatValues = values.flat();  // Flatten the 2D array into a 1D array for parameterized query
-  const finalInsertSQL = insertSQL + valuesPlaceholder;
-
-  // Execute the INSERT query
-  await db.query(finalInsertSQL, flatValues);
-}
+   // Use CREATE TABLE IF NOT EXISTS to avoid the "already exists" error
+   let createTableSQL = `CREATE TABLE IF NOT EXISTS ${tableName} (\n`;
+   createTableSQL += columnNames.map(col => `"${col}" TEXT`).join(',\n');
+   createTableSQL += `,\nUNIQUE ("${uniqueColumn}")`;  // Add unique constraint on the specified column
+   createTableSQL += '\n);';
+ 
+   // Execute the CREATE TABLE IF NOT EXISTS query
+   await db.query(createTableSQL);
+ 
+   // Build the INSERT statement
+   const insertSQL = `INSERT INTO ${tableName} (${columnNames.map(col => `"${col}"`).join(',')}) VALUES \n`;
+ 
+   // Build the VALUES portion of the INSERT statement
+   const values = matrix.slice(1); // Remove the first row (headers)
+   const valuesPlaceholder = values.map((row, rowIndex) => 
+     `(${row.map((_, colIndex) => `$${rowIndex * row.length + colIndex + 1}`).join(', ')})`
+   ).join(',\n');
+ 
+   const flatValues = values.flat();  // Flatten the 2D array into a 1D array for parameterized query
+ 
+   // Build the final UPSERT query using the unique constraint
+   const updateColumns = columnNames.map(col => `"${col}" = EXCLUDED.${col}`).join(', ');
+ 
+   const finalInsertSQL = insertSQL + valuesPlaceholder + `
+     ON CONFLICT ("${uniqueColumn}") 
+     DO UPDATE SET ${updateColumns};
+   `;
+ 
+   // Execute the UPSERT query
+   await db.query(finalInsertSQL, flatValues);
+ }
 
 const getTablesAndColumns = async () => {
   const query = `
@@ -129,23 +139,40 @@ const getTablesAndColumns = async () => {
   }
 };
 
-async function printToXls(querrystr) {
+async function printToXls(queries) {
   const workbook = new ExcelJS.Workbook();
-  const worksheet = workbook.addWorksheet('Query Results');
-  const res = await db.query(querrystr); // Replace with your actual query
-  const columns = Object.keys(res.rows[0]).map(key => ({ header: key, key }));
-  worksheet.columns = columns;
 
-  // Add rows to the Excel sheet
-  res.rows.forEach(row => {
-      worksheet.addRow(row);
-  });
-  let trimmedStr = querrystr.trim();
-  let words = trimmedStr.split(" ");
+  // Get the current date in the format YYYY-MM-DD
+  const currentDate = new Date().toISOString().replace(/:/g, '-').replace('T', '_').split('.')[0];
 
+  // Iterate over each query string in the array
+  for (const queryStr of queries) {
+      const res = await db.query(queryStr); // Replace with your actual query
+
+      // Extract the table name from the query (assumes a format like "SELECT * FROM tableName")
+      const tableName = queryStr.match(/FROM\s+(\w+)/i);
+      const sheetName = tableName ? tableName[1] : 'Query'; // Use the table name as the sheet name, fallback to 'Query'
+
+      // Create a new worksheet for each query
+      const worksheet = workbook.addWorksheet(sheetName);
+      
+      // Define columns based on the query result
+      const columns = Object.keys(res.rows[0]).map(key => ({ header: key, key }));
+      worksheet.columns = columns;
+
+      // Add rows to the Excel sheet
+      res.rows.forEach(row => {
+          worksheet.addRow(row);
+      });
+  }
+
+  // Define the file path for the Excel file, using the current date
+  const filepath = path.resolve('downloads', `lekérdezések_${currentDate}.xlsx`);
+  
   // Write the Excel file
-  await workbook.xlsx.writeFile('querry from '+words[words.length-1]+".xlsx");
-};
+  await workbook.xlsx.writeFile(filepath);
+  console.log(`Excel file created at: ${filepath}`);
+}
 
 // Route to handle file upload
 app.post('/uploadfile', upload.single('file'), (req, res) => {
@@ -192,13 +219,25 @@ app.post('/uploadfile', upload.single('file'), (req, res) => {
               </body>
             </html>
           `);
-          createTableFromMatrix(matrix, req.file.filename.replace('.xlsx', ''));
+          createOrUpsertTableFromMatrix(matrix, req.file.filename.replace('.xlsx', ''));
       } catch (error) {
           res.status(500).send('Error processing the Excel file.');
       }
   });
 });
 
+app.get('/download', (req, res) => {
+  const filepath = path.resolve('downloads', fs.readdirSync('downloads')[0]);
+  res.download(filepath);
+  setTimeout(() => {
+    fs.unlink(filepath, (err) => {
+        if (err) {
+            console.error('Error deleting the file:', err);
+            return;
+        }
+    });
+  }, 1000);
+});
 
 app.get('/upload', async (req, res) => {
   res.render('Upload.ejs');
@@ -237,9 +276,15 @@ app.get('/QM', async (req, res) => {
 app.get('/hr', async (req, res) => {
   res.render('HR.ejs');
 });
+
+app.get('/new', async (req, res) => {
+  const tablesAndColumns = await getTablesAndColumns();
+  res.render('newQuerry', { tablesAndColumns });
+});
   
 app.post('/submit-string', (req, res) => {
   const receivedString = req.body;  // Get the string from the form
+  console.log(receivedString+'in the app.js');
   printToXls(receivedString);  // Use the received string to generate an XLS file
 });
 

@@ -42,17 +42,17 @@
   }
 
 .card-btn{
-  padding: 5px;
+  padding: 30px;
   background-color: rgba(36, 41, 67, .8666666667);
   border: 1px solid black;
   border-radius: 5px;
   color: white;
   font-style: none;
   margin-top: 10px;
+
 }
 
 .card-btn:hover{
-  padding: 5px;
   background-color: rgba(36, 41, 67, .8666666667);
   border: 1px solid black;
   border-radius: 5px;

@@ -52,6 +52,9 @@
     <% }); %>
 
     <button type="button" class="btn btn-primary" onclick="generateArray()">Excel tábla generálás</button>
+    <br><br>
+    <a href="/download"><button type="button" id="downloadButton" class="download-button btn btn-primary" onclick="Hide()">Letöltés</button></a>
+
 
     </div>
     <script>
@@ -63,12 +66,20 @@
             columnDivs.forEach(div => {
                 div.style.display = "none";
             });
+            
+            const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = false;
+            });
 
             // Show columns for the selected table
             if (selectedTable) {
                 document.getElementById(selectedTable + "-columns").style.display = "block";
             }
         }
+
+        const downloadButton=document.getElementById("downloadButton");
+        function Hide() {downloadButton.style.display="none";}
 
         function generateArray() {
             const checkboxes = document.querySelectorAll('input[type="checkbox"]:checked');
@@ -82,6 +93,7 @@
                 },
                 body: querrystr, // Send as string
             })
+            downloadButton.style.display = 'block';
             }
     </script>
 

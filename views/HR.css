@@ -56,7 +56,6 @@
 /* Test és görgetősáv eltávolítása */
 body {
   margin: 0; /* Böngésző alapértelmezett margójának eltávolítása */
-  overflow: hidden; /* Görgetősáv eltávolítása */
   display: flex;
   flex-direction: column;
   height: 100vh; /* Teljes magasság */
@@ -67,7 +66,7 @@ body {
 .footer-container {
   background-color: rgb(255, 238, 214);
   width: 100%;
-  display: flex;
+  display: inline-block;
   justify-content: center;
   align-items: center;
   padding: 20px 0;
@@ -110,4 +109,36 @@ body {
   max-width: 900px; /* Maximális szélesség, hogy ne nyújtózkodjanak túl szélesen */
   margin-left: auto;
   margin-right: auto;
+}
+
+.download-button {
+  display: none;
+}
+
+.disabled-label {
+  pointer-events: none; /* Disable click events on this label */
+}
+.table-section {
+  padding: 15px; /* Increased padding for each block */
+  margin-bottom: 20px; /* Space between blocks */
+  background-color: #f8f9fa; /* Light background for better visibility */
+  border: 1px solid #dee2e6; /* Light border for separation */
+  border-radius: 5px; /* Slightly rounded corners */
+}
+
+.columns-container {
+  display: flex; /* Use flexbox for layout */
+  flex-wrap: wrap; /* Allow wrapping of columns */
+  gap: 20px; /* Space between columns */
+  justify-content: flex-start; /* Align columns to the left */
+}
+
+/* Make checkboxes bigger */
+.column-checkbox {
+  transform: scale(1.5); /* Scale up the checkbox size */
+  margin-right: 10px; /* Space between checkbox and label */
+}
+
+.select-all {
+  margin-bottom: 10px; /* Space below the select all checkbox */
 }
