@@ -6,6 +6,7 @@ import fs from "fs";
 import path from "path";
 import ExcelJS from "exceljs";
 import multer from "multer";
+import Client from 'ssh2-sftp-client';
 
 
 const app = express();
@@ -19,6 +20,14 @@ app.use(express.static("public"));
 app.use(express.urlencoded({ extended: true}));
 app.set('view engine', 'ejs');
 
+const sftp= new Client();
+
+const config={
+  host: 'sftp://168.192.1.220',
+  port: 22,
+  username: 'Taprick',
+  password: 'taprick07'
+};
 
 const db = new pg.Client({
     user: 'postgres', // PostgreSQL felhasználónév
@@ -240,7 +249,9 @@ app.get('/download', (req, res) => {
 });
 
 app.get('/upload', async (req, res) => {
-  res.render('Upload.ejs');
+  const tablesAndColumns = await getTablesAndColumns();
+  const uniqueTableNames = [...new Set(tablesAndColumns.map(table => table.table_name))]; // Get unique table names
+  res.render('Upload', { tableNames: uniqueTableNames });
 });
 
 // API végpont a diákokhoz

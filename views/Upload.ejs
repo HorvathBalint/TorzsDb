@@ -17,27 +17,44 @@
             <button type="button" class="btn-1 text-color">Felhasználó</button>
         </div>
     </header>
+</head>
+<body>
 
-    <div class="hero-container">
-        <h1>Fájl feltöltés (xlsx)</h1>
-        <form action="/uploadfile" method="POST" enctype="multipart/form-data">
-            <label for="customFileName">Írja be a tábla nevét:</label>
-            <input type="text" id="customFileName" name="customFileName" placeholder="Tábla neve">
-            <br><br>
-            <input type="file" name="file" accept=".xlsx" required>
-            <br><br>
-            <button type="submit">Feltöltés</button>
-        </form>
+    <div class="grid-container">
+        <!-- Left column: file upload form -->
+        <div class="hero-container">
+            <h1>Fájl feltöltés (xlsx)</h1>
+            <form action="/uploadfile" method="POST" enctype="multipart/form-data">
+                <label for="customFileName">Írja be a tábla nevét:</label>
+                <input type="text" id="customFileName" name="customFileName" placeholder="Tábla neve">
+                <br><br>
+                <input type="file" name="file" accept=".xlsx" required>
+                <br><br>
+                <button type="submit">Feltöltés</button>
+            </form>
+        </div>
+    
+        <!-- Right column: table buttons -->
+        <div id="table-buttons-container">
+            <h3>Frissítés esetén válasszon a meglévő táblák közül:</h3>
+            <% tableNames.forEach(tableName => { %>
+                <button class="table-button" onclick="fillTableName('<%= tableName %>')"><%= tableName %></button>
+            <% }); %>
+        </div>
     </div>
+    
     <script>
-        
+        // Function to fill the input with the selected table name
+        function fillTableName(tableName) {
+            document.getElementById('customFileName').value = tableName;
+        }
     </script>
 
-    <div class="footer-container">
+    <!-- <div class="footer-container">
         <% const date = new Date(); %>
         <% const year = date.getFullYear(); %>
         <p>&copy; <%= year %> Minden jog fenntartva.</p>
-    </div>
+    </div> -->
 
 </body>
 </html>

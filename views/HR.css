@@ -142,3 +142,25 @@ body {
 .select-all {
   margin-bottom: 10px; /* Space below the select all checkbox */
 }
+
+.table-button {
+  display: inline-block;
+  margin: 5px;
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.table-button:hover {
+  background-color: #0056b3;
+}
+
+.grid-container {
+  display: grid;
+  grid-template-rows: auto auto; /* Two rows with auto height */
+  gap: 20px; /* Gap between rows */
+  padding: 20px;
+}
