@@ -7,6 +7,7 @@ import path from "path";
 import ExcelJS from "exceljs";
 import multer from "multer";
 import Client from 'ssh2-sftp-client';
+import cron from 'node-cron';
 
 
 const app = express();
@@ -23,11 +24,13 @@ app.set('view engine', 'ejs');
 const sftp= new Client();
 
 const config={
-  host: 'sftp://168.192.1.220',
+  host: '192.168.1.220',
   port: 22,
   username: 'Taprick',
   password: 'taprick07'
 };
+
+sftp.connect(config);
 
 const db = new pg.Client({
     user: 'postgres', // PostgreSQL felhasználónév
@@ -297,6 +300,89 @@ app.post('/submit-string', (req, res) => {
   const receivedString = req.body;  // Get the string from the form
   console.log(receivedString+'in the app.js');
   printToXls(receivedString);  // Use the received string to generate an XLS file
+});
+
+// Utility function to convert Excel serial date to JavaScript Date
+function excelDateToFormattedDate(serial) {
+  const utc_days = Math.floor(serial - 25569);
+  const utc_value = utc_days * 86400 * 1000; // milliseconds since epoch
+  const date_info = new Date(utc_value);
+
+  const year = date_info.getUTCFullYear();
+  const month = String(date_info.getUTCMonth() + 1).padStart(2, '0'); // Month is 0-indexed
+  const day = String(date_info.getUTCDate()).padStart(2, '0');
+
+  return `${year}.${month}.${day}`; // Return in YYYY.MM.DD format
+}
+
+// Function to check if a date string needs to be converted
+function isValidDateString(dateString) {
+  // Regex pattern to check for various date formats
+  const datePattern = /^\d{4}\.\d{2}\.\d{2}$/; // Matches YYYY.MM.DD
+  return datePattern.test(dateString);
+}
+
+async function downloadAndLoadData() {
+  try {
+    // Step 2: Download the file (hardcoding the remote path here)
+    const remotePath = '/SAP/SAP_adatok.xlsx';
+    const localFilePath = './SAP_adatok.xlsx';
+    await sftp.get(remotePath, localFilePath);
+
+    console.log('File downloaded successfully');
+
+    // Step 3: Read the Excel file
+    const workbook = xlsx.readFile(localFilePath);
+    const sheetName = workbook.SheetNames[0];
+    const sheetData = xlsx.utils.sheet_to_json(workbook.Sheets[sheetName]);
+
+    fs.unlinkSync(localFilePath);
+    console.log(`Deleted local file: ${localFilePath}`);
+
+    // Load data into the co_workers table
+    if (sheetData.length > 0) {
+      const columns = Object.keys(sheetData[0]);
+    
+      for (const row of sheetData) {
+        // Convert numeric date fields to a proper date format
+        for (const key in row) {
+          // Check for numeric values that might represent Excel dates
+          if (key.toLowerCase().includes("date") && isValidDateString(excelDateToFormattedDate(row[key]))) {
+            // Convert Excel serial date to formatted date string
+            row[key] = excelDateToFormattedDate(row[key]);
+          }
+        }
+    
+        const values = columns.map(column => row[column]);
+    
+        const placeholders = columns.map((_, index) => `$${index + 1}`).join(', ');
+        const updateString = columns.map((col, index) => `${col} = $${index + 1}`).join(', ');
+
+        // Assume 'id' is the unique identifier for conflict resolution
+        await db.query(
+         `
+          INSERT INTO co_workers (${columns.join(', ')}) 
+          VALUES (${placeholders}) 
+          ON CONFLICT (id) 
+          DO UPDATE SET ${updateString}
+          `,
+          values
+        );
+      }
+    }
+
+    console.log('Data loaded successfully');
+  } catch (error) {
+    console.error('Error occurred:', error);
+  } finally {
+    // Close the SFTP connection
+    //sftp.end();
+  }
+}
+
+cron.schedule('*/1 * * * *', () => {
+  console.log('Running scheduled task to download and load data');
+  downloadAndLoadData();
 });
 
 app.listen(port,()=>{
