@@ -8,6 +8,11 @@ import ExcelJS from "exceljs";
 import multer from "multer";
 import Client from 'ssh2-sftp-client';
 import cron from 'node-cron';
+import forge from 'node-forge';
+import rateLimit from 'express-rate-limit';
+import helmet from 'helmet';
+import jwt from 'jsonwebtoken'; // Assuming JWT is used for authentication
+import cors from 'cors';
 
 
 const app = express();
@@ -18,8 +23,15 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.text());
 app.use(express.static("views"));
 app.use(express.static("public"));
-app.use(express.urlencoded({ extended: true}));
+//app.use(verifySSHKey);
 app.set('view engine', 'ejs');
+
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests per windowMs
+  message: 'Too many requests from this IP, please try again later.',
+});
+app.use(limiter);
 
 const sftp= new Client();
 
@@ -41,6 +53,48 @@ const db = new pg.Client({
   });
 
 db.connect();
+
+// Middleware to authenticate requests using JWT
+function authenticateToken(req, res, next) {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+
+  if (!token) return res.sendStatus(401); // Unauthorized
+
+  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+    if (err) return res.sendStatus(403); // Forbidden
+    req.user = user;
+    next();
+  });
+}
+
+//const publicKey = fs.readFileSync('./ssh_keys/id_rsa.pub', 'utf8');
+
+// function verifySSHKey(req, res, next) {
+//   const clientSignature = req.headers['x-client-signature']; // Signature from the client
+//   const clientMessage = req.headers['x-client-message']; // Message signed by the client
+
+//   if (!clientSignature || !clientMessage) {
+//       return res.status(401).send('Unauthorized: Missing signature or message');
+//   }
+
+//   // Verify the signature using the public key
+//   const pki = forge.pki;
+//   const publicKeyObject = pki.publicKeyFromPem(publicKey);
+//   const md = forge.md.sha256.create();
+//   md.update(clientMessage, 'utf8');
+
+//   const isVerified = publicKeyObject.verify(
+//       md.digest().bytes(),
+//       forge.util.decode64(clientSignature)
+//   );
+
+//   if (isVerified) {
+//       next(); // Signature is valid, proceed to the next middleware/route
+//   } else {
+//       res.status(401).send('Unauthorized: Invalid signature');
+//   }
+// }
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -267,16 +321,34 @@ app.get('/api/students', async (req, res) => {
   }
 });
 
-// API végpont a munkatársakhoz
-app.get('/api/co_workers', async (req, res) => {
-    try {
-      const results = await db.query('SELECT * co_workers');
-      res.json(results.rows);
-    } catch (err) {
-      res.status(500).json({ error: err.message });
-    }
-  });
+// Protected API endpoint
+app.get('/api/tantargyweb', authenticateToken, async (req, res) => {
+  try {
+    const results = await db.query(
+      `SELECT co_workers.birthname, students.neptune_id, co_workers.email 
+       FROM co_workers
+       INNER JOIN students ON co_workers.tax_number = students.tax_number`
+    );
+    res.json(results.rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
+app.post('/api/login', async (req, res) => {
+  const { username, password } = req.body;
+
+  // Validate user credentials (this is just an example, implement your own logic)
+  const user = await db.query('SELECT * FROM users WHERE username = $1 AND password = $2', [username, password]);
+
+  if (user.rowCount === 0) {
+    return res.sendStatus(401); // Unauthorized
+  }
+
+  // User found, generate JWT
+  const token = jwt.sign({ username: user.rows[0].username, role: user.rows[0].role }, process.env.JWT_SECRET, { expiresIn: '1h' });
+  res.json({ token });
+});
 
 app.get('/homepage', async (req, res) => {
   res.render('HomePage.ejs');
@@ -322,11 +394,9 @@ function isValidDateString(dateString) {
   return datePattern.test(dateString);
 }
 
-async function downloadAndLoadData() {
+async function downloadAndLoadData(remotePath, localFilePath, tableName) {
   try {
     // Step 2: Download the file (hardcoding the remote path here)
-    const remotePath = '/SAP/SAP_adatok.xlsx';
-    const localFilePath = './SAP_adatok.xlsx';
     await sftp.get(remotePath, localFilePath);
 
     console.log('File downloaded successfully');
@@ -361,7 +431,7 @@ async function downloadAndLoadData() {
         // Assume 'id' is the unique identifier for conflict resolution
         await db.query(
          `
-          INSERT INTO co_workers (${columns.join(', ')}) 
+          INSERT INTO ${tableName} (${columns.join(', ')}) 
           VALUES (${placeholders}) 
           ON CONFLICT (id) 
           DO UPDATE SET ${updateString}
@@ -374,15 +444,13 @@ async function downloadAndLoadData() {
     console.log('Data loaded successfully');
   } catch (error) {
     console.error('Error occurred:', error);
-  } finally {
-    // Close the SFTP connection
-    //sftp.end();
   }
 }
 
-cron.schedule('*/1 * * * *', () => {
+cron.schedule('0 3 * * *', () => {
   console.log('Running scheduled task to download and load data');
-  downloadAndLoadData();
+  downloadAndLoadData('/SAP/SAP_adatok.xlsx','./sftp/SAP_adatok.xlsx', 'co_workers');
+  downloadAndLoadData('/Neptun/Neptun_adatok.xlsx','./sftp/Neptun_adatok.xlsx', 'students');
 });
 
 app.listen(port,()=>{
