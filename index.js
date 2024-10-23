@@ -33,6 +33,10 @@ const limiter = rateLimit({
 });
 app.use(limiter);
 
+app.use(cors({
+  origin: 'http://localhost:3001' // Replace with the front-end server's address
+}));
+
 const sftp= new Client();
 
 const config={
@@ -322,10 +326,10 @@ app.get('/api/students', async (req, res) => {
 });
 
 // Protected API endpoint
-app.get('/api/tantargyweb', authenticateToken, async (req, res) => {
+app.get('/api/tantargyweb', async (req, res) => {
   try {
     const results = await db.query(
-      `SELECT co_workers.birthname, students.neptune_id, co_workers.email 
+      `SELECT co_workers.birthname, students.neptune_id, co_workers.email_sze 
        FROM co_workers
        INNER JOIN students ON co_workers.tax_number = students.tax_number`
     );
