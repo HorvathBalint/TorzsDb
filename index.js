@@ -58,19 +58,19 @@ const db = new pg.Client({
 
 db.connect();
 
-// Middleware to authenticate requests using JWT
-function authenticateToken(req, res, next) {
-  const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1];
+// // Middleware to authenticate requests using JWT
+// function authenticateToken(req, res, next) {
+//   const authHeader = req.headers['authorization'];
+//   const token = authHeader && authHeader.split(' ')[1];
 
-  if (!token) return res.sendStatus(401); // Unauthorized
+//   if (!token) return res.sendStatus(401); // Unauthorized
 
-  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
-    if (err) return res.sendStatus(403); // Forbidden
-    req.user = user;
-    next();
-  });
-}
+//   jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+//     if (err) return res.sendStatus(403); // Forbidden
+//     req.user = user;
+//     next();
+//   });
+// }
 
 //const publicKey = fs.readFileSync('./ssh_keys/id_rsa.pub', 'utf8');
 
@@ -329,7 +329,7 @@ app.get('/api/students', async (req, res) => {
 app.get('/api/tantargyweb', async (req, res) => {
   try {
     const results = await db.query(
-      `SELECT co_workers.birthname, students.neptune_id, co_workers.email_sze 
+      `SELECT co_workers.birthname, students.neptune_id, email
        FROM co_workers
        INNER JOIN students ON co_workers.tax_number = students.tax_number`
     );
