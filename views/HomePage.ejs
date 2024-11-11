@@ -8,26 +8,36 @@
     <title>Kezdőlap</title>
 </head>
 <body>
-    <header class="d-flex flex-wrap justify-content-center py-3 border-bottom container-fluid header-color header">
-        <a href="/homepage" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-dark text-decoration-none">
-            <img src="icon-1.png" width="55" height="70" class="p-2"/>
-            <span class="text-color">Törzsadatbázis</span>
-        </a>
-        <div class="text-end">
-            <button type="button" class="btn-1 text-color">Felhasználó</button>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header d-flex justify-content-between align-items-center">
+            <a href="/homepage" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-decoration-none">
+                <img src="icon-1.png" class="p-2" />
+                <span class="text-color">Törzsadatbázis</span>
+            </a>
+            <div class="text-end">
+                <span class="text-color">Felhasználó</span>
+            </div>
+        </header>
+
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <a href="#">Hiba bejelentése</a>
+            <a href="#">Súgó</a>
         </div>
-    </header>
 
-    <div class="hero-container">
-        <a href="/new"><button class="btn card-btn">Lekérdezés tervező</button></a>
-        <a href="/upload"><button class="btn card-btn">Tábla feltöltés (xlsx)</button></a>
-    </div>
+        <!-- Main content -->
+        <div class="main-content">
+            <div class="hero-container">
+                <a href="/new"><button class="btn card-btn">Lekérdezés tervező</button></a>
+                <a href="/upload"><button class="btn card-btn">Tábla feltöltés (.xlsx)</button></a>
+            </div>
+        </div>
 
-    <div class="footer-container">
-        <% const date = new Date(); %>
-        <% const year = date.getFullYear(); %>
-        <p>&copy; <%= year %> Minden jog fenntartva.</p>
+        <!-- Footer -->
+        <div class="footer-container">
+            <p>&copy; <script>document.write(new Date().getFullYear());</script> Minden jog fenntartva.</p>
+        </div>
     </div>
-    
 </body>
 </html>

@@ -4,10 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <link rel="stylesheet" href="/HR.css">
+    <link rel="stylesheet" href="/HomePage.css">
     <title>Lekérdezés generáló</title>
 </head>
-<body>
+<body style="background-color: #f1f1f1;">
     <header class="d-flex flex-wrap justify-content-center py-3 border-bottom container-fluid header-color header">
         <a href="/homepage" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-dark text-decoration-none">
             <img src="icon-1.png" width="55" height="70" class="p-2"/>
@@ -18,11 +18,11 @@
         </div>
     </header>
     
-    <div style="margin: 10px;">
-        <h1>Lekérdezés készítő</h1>
+    <div style="margin: 10px; justify-content: center;">
+        <h1 style="align-items: center; text-align: center;">Lekérdezés készítő</h1>
 
         <!-- Checkbox for each table -->
-        <div id="tableCheckboxes" class="mb-3">
+        <div style="align-items: center; text-align: center;" id="tableCheckboxes" class="mb-3">
             <% 
             const tableNameMap={
                 "co_workers":"Munkatársak",
@@ -33,12 +33,12 @@
                 tableNames.add(row.table_name);
             });
             %>
-            <div class="btn-group" role="group">
+            <div role="group">
                 <% tableNames.forEach(function(tableName) { 
                     const displayName = tableNameMap[tableName] || tableName; // Use the display name if it exists
                 %>
                     <input type="checkbox" id="<%= tableName %>-checkbox" onchange="toggleColumns('<%= tableName %>')" class="btn-check" autocomplete="off">
-                    <label class="btn btn-outline-primary" for="<%= tableName %>-checkbox"><%= displayName %></label>
+                    <label class="check-card-btn" for="<%= tableName %>-checkbox"><%= displayName %></label>
                 <% }); %>
             </div>
         </div>
@@ -57,7 +57,7 @@
                         if (row.table_name === tableName) { 
                             const columnDisplayName = row.column_name; // Add your mapping for columns if needed
                     %>
-                            <input type="checkbox" class="column-checkbox" data-table="<%= tableName %>" id="<%= row.column_name %>" name="<%= row.column_name %>">
+                            <input type="checkbox" class="column-checkbox" onchange="checkButtonVisibility()" data-table="<%= tableName %>" id="<%= row.column_name %>" name="<%= row.column_name %>">
                             <label for="<%= row.column_name %>"><%= columnDisplayName %></label><br>
                     <% } } ); %>
                 </div>
@@ -65,19 +65,15 @@
         </div>
 
         <br><br>
-        <button type="button" class="btn btn-primary" onclick="generateArray()">Excel tábla generálás</button>
-        <br><br>
-        <a href="/download"><button type="button" id="downloadButton" class="download-button btn btn-primary" onclick="Hide()">Letöltés</button></a>
 
+        <div id="button-container" style="display: none; text-align: center;">
+            <a href="/download">
+                <button type="button" class="btn btn-success" onclick="generateArray()">Excel tábla generálás</button>
+            </a>
+        </div>
     </div>
     
     <script>
-        const downloadButton = document.getElementById("downloadButton");
-
-        function Hide() {
-            downloadButton.style.display = "none";
-        }
-
         function toggleColumns(tableName) {
             const columnsDiv = document.getElementById(`${tableName}-columns`);
             const checkbox = document.getElementById(`${tableName}-checkbox`);
@@ -92,6 +88,8 @@
                 const columnCheckboxes = columnsDiv.querySelectorAll('.column-checkbox');
                 columnCheckboxes.forEach(colCheckbox => colCheckbox.checked = false);
             }
+
+            checkButtonVisibility(); // Check if any column is selected
         }
 
         function toggleAllColumns(tableName) {
@@ -102,6 +100,20 @@
             columnCheckboxes.forEach(checkbox => {
                 checkbox.checked = selectAllCheckbox.checked;
             });
+
+            checkButtonVisibility(); // Check if any column is selected
+        }
+
+        // Function to check if any column is selected and show the button accordingly
+        function checkButtonVisibility() {
+            const selectedColumns = document.querySelectorAll('.column-checkbox:checked');
+            const buttonContainer = document.getElementById('button-container');
+            
+            if (selectedColumns.length > 0) {
+                buttonContainer.style.display = 'block'; // Show the button
+            } else {
+                buttonContainer.style.display = 'none'; // Hide the button
+            }
         }
 
         function generateArray() {
@@ -141,8 +153,6 @@
                 },
                 body: JSON.stringify(queries), // Send as JSON
             });
-
-            downloadButton.style.display = 'block';
         }
     </script>
 

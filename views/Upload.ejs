@@ -30,13 +30,11 @@
                 <br><br>
                 <input type="file" name="file" accept=".xlsx" required>
                 <br><br>
-                <button type="submit">Feltöltés</button>
+                <button class="btn btn-success" type="submit">Feltöltés</button>
             </form>
-        </div>
-    
-        <!-- Right column: table buttons -->
-        <div id="table-buttons-container">
+            <br>
             <h3>Frissítés esetén válasszon a meglévő táblák közül:</h3>
+            <br>
             <% tableNames.forEach(tableName => { %>
                 <button class="table-button" onclick="fillTableName('<%= tableName %>')"><%= tableName %></button>
             <% }); %>

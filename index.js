@@ -298,7 +298,9 @@ app.post('/uploadfile', upload.single('file'), (req, res) => {
 
 app.get('/download', (req, res) => {
   const filepath = path.resolve('downloads', fs.readdirSync('downloads')[0]);
-  res.download(filepath);
+  setTimeout(() =>{
+    res.download(filepath);
+  }, 500);
   setTimeout(() => {
     fs.unlink(filepath, (err) => {
         if (err) {
@@ -358,13 +360,18 @@ app.get('/homepage', async (req, res) => {
   res.render('HomePage.ejs');
 });
 
+app.get('/', async (req, res) => {
+  res.render('HomePage.ejs');
+});
+
+app.get('/test', async (req, res) => {
+  const tablesAndColumns = await getTablesAndColumns();
+  res.render('test.ejs', { tablesAndColumns });
+});
+
 app.get('/QM', async (req, res) => {
   const tablesAndColumns = await getTablesAndColumns();
   res.render('QuerryMaker', { tablesAndColumns });
-});
-
-app.get('/hr', async (req, res) => {
-  res.render('HR.ejs');
 });
 
 app.get('/new', async (req, res) => {

@@ -46,7 +46,7 @@
 
 /* Központi tartalom beállítások */
 .hero-container {
-  background-color: rgb(255, 238, 214);
+  background-color: #f1f1f1;
   flex: 1; /* A maradék helyet kitölti */
   text-align: center;
   overflow: hidden;
@@ -59,12 +59,12 @@ body {
   display: flex;
   flex-direction: column;
   height: 100vh; /* Teljes magasság */
-  background-color: rgb(255, 238, 214);
+  background-color: #f1f1f1;
 }
 
 /* Lábjegyzet (footer) */
 .footer-container {
-  background-color: rgb(255, 238, 214);
+  background-color: #f1f1f1;
   width: 100%;
   display: inline-block;
   justify-content: center;
@@ -121,7 +121,7 @@ body {
 .table-section {
   padding: 15px; /* Increased padding for each block */
   margin-bottom: 20px; /* Space between blocks */
-  background-color: #f8f9fa; /* Light background for better visibility */
+  background-color: #f1f1f1; /* Light background for better visibility */
   border: 1px solid #dee2e6; /* Light border for separation */
   border-radius: 5px; /* Slightly rounded corners */
 }
@@ -144,18 +144,19 @@ body {
 }
 
 .table-button {
-  display: inline-block;
-  margin: 5px;
-  padding: 10px 20px;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
+  background-color: #ffffff;
+  border: 1px solid #d2d2d2;
+  border-radius: 8px;
+  font-size: 18px;
+  color: #2C3E50;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
 }
 
 .table-button:hover {
-  background-color: #0056b3;
+  background-color: #41465c;
+  color: white;
 }
 
 .grid-container {
@@ -163,4 +164,24 @@ body {
   grid-template-rows: auto auto; /* Two rows with auto height */
   gap: 20px; /* Gap between rows */
   padding: 20px;
+}
+
+.sidebar-color{
+  background-color: rgba(36, 41, 67, .8666666667);
+}
+
+.sidebar-margin-top{
+  margin-top: 50px;
+}
+
+.sidebar-text{
+  color: white;
+  font-size: 25px;
+  text-decoration: none;
+  padding-top: 25px;
+  padding-bottom: 25px;
+}
+
+.sidebar-text:hover{
+  color: yellow;
 }
