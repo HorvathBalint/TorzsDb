@@ -1,6 +1,6 @@
 .app-container {
   display: grid;
-  grid-template-columns: 250px 1fr; /* Sidebar + Main content */
+  grid-template-columns: 300px 1fr; /* Sidebar + Main content */
   grid-template-rows: auto 1fr; /* Header + Content */
   grid-template-areas: 
       "header header"
@@ -19,11 +19,13 @@
   padding: 0;
   overflow-y: auto;
   grid-area: sidebar;
+
 }
 
 .sidebar a {
   color: white;
   padding: 10px;
+  padding-left: 20px;
   text-decoration: none;
   margin-bottom: 10px;
   display: flex;
@@ -31,6 +33,7 @@
   gap: 8px; /* Space between icon and text */
   text-decoration: none;
   color: inherit;
+  font-size: 20px;
 }
 
 .sidebar img {
@@ -49,13 +52,14 @@
   grid-area: header;
 }
 
+
 .header img {
   width: 55px;
   height: 70px;
 }
 
 .header .text-color {
-  font-size: 25px;
+  font-size: 35px;
   padding-right: 20px;
 }
 
@@ -69,16 +73,19 @@
 
 
 .card-btn {
-  width: 200px;
-  height: 150px;
+  width: 250px;
+  height: 200px;
   background-color: #ffffff;
   border: 1px solid #d2d2d2;
   border-radius: 8px;
-  font-size: 18px;
+  font-size: 25px;
   color: #2C3E50;
   display: flex;
   align-items: center;
   justify-content: center;
+}
+.card-btn i {
+  font-size: 40px;  /* Size of the icon */
 }
 
 a {
@@ -160,6 +167,10 @@ a {
   padding-left: 20px;
 }
 
+.hero-container2 input{
+  font-size: 50px;
+}
+
 .btn-container{
   display: flex;
   gap: 20px;
@@ -219,7 +230,7 @@ body {
   display: flex; /* Use flexbox for layout */
   flex-wrap: wrap; /* Allow wrapping of columns */
   gap: 20px; /* Space between columns */
-  justify-content: center; /* Align columns to the left */
+  justify-content: left; /* Align columns to the left */
 }
 
 /* Make checkboxes bigger */
@@ -259,7 +270,7 @@ body {
   background-color: #ffffff;
   border: 1px solid #d2d2d2;
   border-radius: 8px;
-  font-size: 18px;
+  font-size: 25px;
   color: #2C3E50;
   align-items: center;
   justify-content: center;
@@ -274,4 +285,41 @@ body {
 input[type="checkbox"]:checked + .check-card-btn {
   background-color: #41465c; 
   color: white;
+}
+
+.hero-container2 form {
+  max-width: 170vh;
+}
+.form-container h1 {
+  font-size: 1.5rem;
+  margin-bottom: 20px;
+}
+.form-textarea {
+  height: 100px;
+  resize: none;
+}
+
+.emailcard{
+  padding:15px;
+  margin-right: 20px;
+  font-size: larger;
+  color: #50adc9;
+}
+
+.emailcard button {
+  background-color: #50adc9;
+  border: none;
+  padding:20px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+.emailcard button:hover{
+  background-color: #83b9c9;
+}
+
+.container-card {
+  display: flex;
+  flex-direction: column;
+  grid-template-rows: auto auto;  /* Defines two rows */
 }

@@ -260,6 +260,11 @@ async function printToXls(queries) {
   console.log(`Excel file created at: ${filepath}`);
 }
 
+app.get('/help', (req, res) => {
+  const filePath = path.resolve('views','pdfs','pdf.pdf');
+  res.sendFile(filePath);
+});
+
 // Route to handle file upload
 app.post('/uploadfile', upload.single('file'), (req, res) => {
   if (!req.file) {
@@ -381,10 +386,6 @@ app.get('/', async (req, res) => {
 
 app.get('/bugreport', async (req, res) => {
   res.render('Bugreport.ejs');
-});
-
-app.get('/help', async (req, res) => {
-  res.render('Help.ejs');
 });
 
 app.get('/test', async (req, res) => {

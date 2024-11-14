@@ -6,6 +6,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link rel="stylesheet" href="/HomePage.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <title>Kezdőlap</title>
 </head>
 <body>
@@ -26,17 +28,37 @@
             <a href="/querrymaker"><i class="bi bi-table"></i> Lekérdezés tervező</a>
             <a href="/upload"><i class="bi bi-cloud-arrow-up"></i>Tábla feltöltés</a>
             <a href="/bugreport"><i class="bi bi-bug"></i>Hiba bejelentése</a>
-            <a href="/help"><i class="bi bi-info-circle"></i>Súgó</a>
+            <a href="/help" target="_blank"><i class="bi bi-info-circle"></i>Súgó</a>
         </div>
 
         <!-- Main content -->
         <div class="main-content">
             <div class="title"><h2 style="font-weight: bold;">Kezdőlap</h2></div>
-            <div class="hero-container">
-                <a href="/querrymaker"><button class="btn card-btn">Lekérdezés tervező</button></a>
-                <a href="/upload"><button class="btn card-btn">Tábla feltöltés</button></a>
-                <a href="/bugreport"><button class="btn card-btn">Hiba bejelentése</button></a>
-                <a href="/help"><button class="btn card-btn">Súgó</button></a>
+            <div class="hero-container d-flex flex-wrap">
+                <div><a href="/querrymaker">
+                    <button class="btn card-btn container-card">
+                        <i class="bi bi-table"></i>
+                        <span>Lekérdezés tervező</span>
+                    </button>
+                </a></div>
+                <div><a href="/upload">
+                    <button class="btn card-btn container-card">
+                        <i class="bi bi-cloud-arrow-up-fill"></i>
+                        <span>Tábla feltöltés</span>
+                    </button>
+                </a></div>
+                <div><a href="/bugreport">
+                    <button class="btn card-btn container-card">
+                        <i class="bi bi-bug-fill"></i>
+                        <span>Hiba bejelentése</span>
+                    </button>
+                </a></div>
+                <div><a href="/help" target="_blank">
+                    <button class="btn card-btn container-card">
+                        <i class="bi bi-info-circle-fill"></i>
+                        <span>Súgó</span>
+                    </button>
+                </a></div>
             </div>
         </div>
 

@@ -22,7 +22,7 @@
         <a href="/querrymaker"><i class="bi bi-table"></i> Lekérdezés tervező</a>
         <a href="/upload"><i class="bi bi-cloud-arrow-up"></i>Tábla feltöltés</a>
         <a href="/bugreport"><i class="bi bi-bug"></i>Hiba bejelentése</a>
-        <a href="/help"><i class="bi bi-info-circle"></i>Súgó</a>
+        <a href="/help" target="_blank"><i class="bi bi-info-circle"></i>Súgó</a>
     </div>
     <div class="main-content">
     <div class="title"><h2 style="font-weight: bold;">Lekérdezés készítő</h2></div>
@@ -33,6 +33,7 @@
             const tableNameMap={
                 "co_workers":"Munkatársak",
                 "students":"Diákok",
+                "testtable":"Tesztábla",
             };
             let tableNames = new Set();
             tablesAndColumns.forEach(function(row) { 
@@ -55,9 +56,9 @@
                 const displayName = tableNameMap[tableName] || tableName; // Use the display name if it exists
             %>
                 <div id="<%= tableName %>-columns" class="table-section col-md-4" style="display: none; width: 30%;">
-                    <h2><%= displayName %> tábla oszlopai:</h2>
+                    <h2><%= displayName %> adatai:</h2>
                     <input type="checkbox" id="<%= tableName %>-select-all" class="select-all" onchange="toggleAllColumns('<%= tableName %>')">
-                    <label for="<%= tableName %>-select-all">Select All</label><br>
+                    <label for="<%= tableName %>-select-all">Összes kijelölése</label><br>
                     
                     <% tablesAndColumns.forEach(function(row) { 
                         if (row.table_name === tableName) { 
@@ -72,8 +73,8 @@
 
         <br><br>
 
-        <div id="button-container" style="display: none; text-align: center;">
-                <button type="button" class="btn btn-success" onclick="generateArray()">Excel tábla letöltése</button>
+        <div id="button-container" style="display: none;">
+                <button style=" font-size: 25px; padding: 10px;" type="button" class="btn btn-success" onclick="generateArray()">Excel tábla letöltése</button>
         </div>
     </div>
 </div>
