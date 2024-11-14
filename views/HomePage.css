@@ -8,11 +8,15 @@
   height: 100vh;
 }
 
+.customicon {
+  filter: invert(1); /* Inverts black to white */
+}
+
 /* Sidebar Styling */
 .sidebar {
   background-color: #242943;
   color: white;
-  padding: 20px;
+  padding: 0;
   overflow-y: auto;
   grid-area: sidebar;
 }
@@ -21,9 +25,18 @@
   color: white;
   padding: 10px;
   text-decoration: none;
-  display: block;
   margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px; /* Space between icon and text */
+  text-decoration: none;
+  color: inherit;
 }
+
+.sidebar img {
+  transform: scale(0.1);
+}
+
 
 .sidebar a:hover {
   background-color: #575757;
@@ -33,7 +46,6 @@
 .header {
   background-color: #41465c;
   color: white;
-  padding: 15px;
   grid-area: header;
 }
 
@@ -44,20 +56,17 @@
 
 .header .text-color {
   font-size: 25px;
+  padding-right: 20px;
 }
 
 /* Main Content Styling */
 .main-content {
-  /* padding: 20px; */
+  display: grid;
+  grid-template-rows: auto 1fr; /* Creates two equal columns */
   grid-area: content;
 }
 
-.hero-container {
-  display: flex;
-  gap: 20px;
-  justify-content: center;
-  padding-top: 50px;
-}
+
 
 .card-btn {
   width: 200px;
@@ -98,10 +107,6 @@ a {
   color: rgb(255, 255, 255);
 }
 
-.header-color{
-    background-color: rgba(36, 41, 67, .8666666667);
-}
-
 .text-color{
     color: white;
     font-size: 25px;
@@ -130,12 +135,40 @@ a {
     }
   }
 
-.hero-container{
+.hero-container {
+  display: flex;
+  gap: 20px;
+  justify-content: left;
+  padding-top: 50px;
   background-color: #f1f1f1;
   height: 100vh;
   width: 100%;
   text-align: center;
   overflow: hidden;
+  padding-left: 20px;
+}
+.hero-container2 {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  justify-content: left;
+  padding-top: 50px;
+  background-color: #f1f1f1;
+  height: 100vh;
+  width: 100%;
+  overflow: hidden;
+  padding-left: 20px;
+}
+
+.btn-container{
+  display: flex;
+  gap: 20px;
+}
+
+.title{
+  background-color: #f1f1f1;
+  padding-top: 40px;
+  padding-left: 20px;
 }
 
 body {
@@ -144,6 +177,7 @@ body {
   overflow: hidden; 
   flex-direction: column;
   height: 100vh; /* Teljes magasság */
+  font-family: Montserrat-medium,sans-serif;
 }
 
 .footer-container {
@@ -168,10 +202,6 @@ body {
   text-decoration: none;
   padding-top: 25px;
   padding-bottom: 25px;
-}
-
-.download-button {
-  display: none;
 }
 
 .disabled-label {
@@ -203,25 +233,26 @@ body {
 }
 
 .table-button {
-  display: inline-block;
-  margin: 5px;
-  padding: 10px 20px;
-  background-color: #007bff;
-  color: rgb(255, 255, 255);
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
+  background-color: #ffffff;
+  border: 1px solid #d2d2d2;
+  border-radius: 8px;
+  font-size: 18px;
+  color: #2C3E50;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
 }
 
 .table-button:hover {
-  background-color: #0056b3;
+  background-color: #41465c;
+  color: white;
 }
 
 .grid-container {
   display: grid;
   grid-template-rows: auto auto; /* Two rows with auto height */
   gap: 20px; /* Gap between rows */
-  padding: 20px;
+
 }
 
 .check-card-btn{

@@ -1,4 +1,29 @@
 /* Gombok */
+.app-container {
+  display: grid;
+  grid-template-columns: 1fr; /* Sidebar + Main content */
+  grid-template-rows: auto 1fr; /* Header + Content */
+  grid-template-areas: 
+      "header header"
+      "sidebar content";
+  height: 100vh;
+}
+
+.header {
+  background-color: #41465c;
+  color: white;
+  grid-area: header;
+}
+
+.header img {
+  width: 55px;
+  height: 70px;
+}
+
+.header .text-color {
+  font-size: 25px;
+  padding-right: 20px;
+}
 .btn-1 {
   color: white;
   background: none;
@@ -8,11 +33,6 @@
 
 .btn-1:hover {
   color: yellow;
-}
-
-/* Fejléc és színek */
-.header-color {
-  background-color: rgba(36, 41, 67, .8666666667);
 }
 
 .text-color {
@@ -185,3 +205,4 @@ body {
 .sidebar-text:hover{
   color: yellow;
 }
+

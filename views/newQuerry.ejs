@@ -5,24 +5,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link rel="stylesheet" href="/HomePage.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <title>Lekérdezés generáló</title>
 </head>
-<body style="background-color: #f1f1f1;">
-    <header class="d-flex flex-wrap justify-content-center py-3 border-bottom container-fluid header-color header">
-        <a href="/homepage" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-dark text-decoration-none">
-            <img src="icon-1.png" width="55" height="70" class="p-2"/>
+<body class="app-container" style="background-color: #f1f1f1;">
+    <header class="header d-flex justify-content-between align-items-center">
+        <a href="/homepage" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-decoration-none">
+            <img src="icons/icon_sze.png" style="transform: scale(0.7);"/>
             <span class="text-color">Törzsadatbázis</span>
         </a>
         <div class="text-end">
-            <button type="button" class="btn-1 text-color">Felhasználó</button>
+            <span class="text-color">Felhasználó</span>
         </div>
     </header>
-    
-    <div style="margin: 10px; justify-content: center;">
-        <h1 style="align-items: center; text-align: center;">Lekérdezés készítő</h1>
-
+    <div class="sidebar" style="padding-top: 30px;">
+        <a href="/querrymaker"><i class="bi bi-table"></i> Lekérdezés tervező</a>
+        <a href="/upload"><i class="bi bi-cloud-arrow-up"></i>Tábla feltöltés</a>
+        <a href="/bugreport"><i class="bi bi-bug"></i>Hiba bejelentése</a>
+        <a href="/help"><i class="bi bi-info-circle"></i>Súgó</a>
+    </div>
+    <div class="main-content">
+    <div class="title"><h2 style="font-weight: bold;">Lekérdezés készítő</h2></div>
+    <div class="hero-container2">
         <!-- Checkbox for each table -->
-        <div style="align-items: center; text-align: center;" id="tableCheckboxes" class="mb-3">
+        <div style="align-items: center;" id="tableCheckboxes" class="mb-3">
             <% 
             const tableNameMap={
                 "co_workers":"Munkatársak",
@@ -67,11 +73,10 @@
         <br><br>
 
         <div id="button-container" style="display: none; text-align: center;">
-            <a href="/download">
-                <button type="button" class="btn btn-success" onclick="generateArray()">Excel tábla generálás</button>
-            </a>
+                <button type="button" class="btn btn-success" onclick="generateArray()">Excel tábla letöltése</button>
         </div>
     </div>
+</div>
     
     <script>
         function toggleColumns(tableName) {
@@ -153,6 +158,9 @@
                 },
                 body: JSON.stringify(queries), // Send as JSON
             });
+            setTimeout(() => {
+                window.location.href = '/download';
+            }, 1500);
         }
     </script>
 

@@ -13,6 +13,22 @@ import rateLimit from 'express-rate-limit';
 import helmet from 'helmet';
 import jwt from 'jsonwebtoken'; // Assuming JWT is used for authentication
 import cors from 'cors';
+import dotenv from 'dotenv';
+import nodemailer from 'nodemailer';
+
+// Configure dotenv
+dotenv.config();
+
+// Nodemailer setup
+const transporter = nodemailer.createTransport({
+  host: process.env.EMAIL_HOST,
+  port: process.env.EMAIL_PORT,
+  secure: false, // true for 465, false for 587
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
+});
 
 
 const app = express();
@@ -298,9 +314,8 @@ app.post('/uploadfile', upload.single('file'), (req, res) => {
 
 app.get('/download', (req, res) => {
   const filepath = path.resolve('downloads', fs.readdirSync('downloads')[0]);
-  setTimeout(() =>{
-    res.download(filepath);
-  }, 500);
+  console.log(filepath);
+  res.download(filepath);
   setTimeout(() => {
     fs.unlink(filepath, (err) => {
         if (err) {
@@ -308,7 +323,7 @@ app.get('/download', (req, res) => {
             return;
         }
     });
-  }, 1000);
+  }, 2500);
 });
 
 app.get('/upload', async (req, res) => {
@@ -364,6 +379,14 @@ app.get('/', async (req, res) => {
   res.render('HomePage.ejs');
 });
 
+app.get('/bugreport', async (req, res) => {
+  res.render('Bugreport.ejs');
+});
+
+app.get('/help', async (req, res) => {
+  res.render('Help.ejs');
+});
+
 app.get('/test', async (req, res) => {
   const tablesAndColumns = await getTablesAndColumns();
   res.render('test.ejs', { tablesAndColumns });
@@ -374,15 +397,53 @@ app.get('/QM', async (req, res) => {
   res.render('QuerryMaker', { tablesAndColumns });
 });
 
-app.get('/new', async (req, res) => {
+app.get('/querrymaker', async (req, res) => {
   const tablesAndColumns = await getTablesAndColumns();
-  res.render('newQuerry', { tablesAndColumns });
+  res.render('newQuerry.ejs', { tablesAndColumns });
 });
   
 app.post('/submit-string', (req, res) => {
   const receivedString = req.body;  // Get the string from the form
   console.log(receivedString+'in the app.js');
   printToXls(receivedString);  // Use the received string to generate an XLS file
+});
+
+// Endpoint to handle email sending
+app.post('/send-email', upload.single('attachment'), async (req, res) => {
+  const { subject, message } = req.body;
+  const toEmail = process.env.TO_EMAIL;
+
+  // Set up email options
+  const mailOptions = {
+    from: process.env.EMAIL_USER,
+    to: toEmail,
+    subject: subject,
+    text: message,
+    attachments: req.file
+      ? [
+          {
+            filename: req.file.originalname,
+            path: req.file.path,
+          },
+        ]
+      : [],
+  };
+
+  try {
+    // Send the email
+    await transporter.sendMail(mailOptions);
+    res.send('Email sent successfully!');
+  } catch (error) {
+    console.error('Error sending email:', error);
+    res.status(500).send('Failed to send email');
+  } finally {
+    // Remove the uploaded file from the server after sending the email
+    if (req.file) {
+      fs.unlink(req.file.path, (err) => {
+        if (err) console.error('Error removing file:', err);
+      });
+    }
+  }
 });
 
 // Utility function to convert Excel serial date to JavaScript Date
