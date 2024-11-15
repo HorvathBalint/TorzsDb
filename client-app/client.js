@@ -19,7 +19,7 @@ app.get('/', (req, res) => {
       <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Co-Workers and Students Data</title>
+        <title>Tantárgyweb</title>
         <style>
           body { font-family: Arial, sans-serif; text-align: center; }
           table { width: 80%; margin: 20px auto; border-collapse: collapse; }
@@ -29,12 +29,12 @@ app.get('/', (req, res) => {
         </style>
       </head>
       <body>
-        <h1>Co-Workers and Students Data</h1>
+        <h1>Tantárgyweb</h1>
         <div id="data-container"></div>
         <script>
           async function fetchData() {
             try {
-              const response = await fetch('http://localhost:3000/api/tantargyweb');
+              const response = await fetch('http://localhost:3000/protected');
               if (!response.ok) throw new Error('Failed to fetch data');
 
               const data = await response.json();

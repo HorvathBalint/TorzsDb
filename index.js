@@ -39,6 +39,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.text());
 app.use(express.static("views"));
 app.use(express.static("public"));
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 //app.use(verifySSHKey);
 app.set('view engine', 'ejs');
 
@@ -73,6 +75,33 @@ const db = new pg.Client({
   });
 
 db.connect();
+
+// Egyszerű API kulcs lista (helyettesítsd adatbázissal éles használatra)
+const validApiKeys = ["T8@zP1q!Xm#9wB6$"]; 
+
+// Middleware a hozzáférés ellenőrzéséhez
+const accessControl = (req, res, next) => {
+    const apiKey = req.header('x-api-key'); // Az API kulcs a fejlécben
+    if (validApiKeys.includes(apiKey)) {
+        next(); // Tovább engedi a kérést
+    } else {
+        res.status(403).json({ error: "Hozzáférés megtagadva" }); // Hozzáférés elutasítva
+    }
+};
+
+// Védett végpont
+app.get('/protected', accessControl, async (req, res) => {
+  try {
+    const results = await db.query(
+      `SELECT co_workers.birthname, students.neptune_id, email
+       FROM co_workers
+       INNER JOIN students ON co_workers.tax_number = students.tax_number`
+    );
+    res.json(results.rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
 // // Middleware to authenticate requests using JWT
 // function authenticateToken(req, res, next) {
@@ -410,40 +439,34 @@ app.post('/submit-string', (req, res) => {
 });
 
 // Endpoint to handle email sending
-app.post('/send-email', upload.single('attachment'), async (req, res) => {
-  const { subject, message } = req.body;
-  const toEmail = process.env.TO_EMAIL;
-
-  // Set up email options
-  const mailOptions = {
-    from: process.env.EMAIL_USER,
-    to: toEmail,
-    subject: subject,
-    text: message,
-    attachments: req.file
-      ? [
-          {
-            filename: req.file.originalname,
-            path: req.file.path,
-          },
-        ]
-      : [],
-  };
-
+// Endpoint to handle form submission
+app.post('/send-email', upload.array('images', 10), async (req, res) => {
   try {
-    // Send the email
-    await transporter.sendMail(mailOptions);
-    res.send('Email sent successfully!');
+      const { title, description } = req.body;
+      const attachments = req.files.map(file => ({
+          filename: file.originalname,
+          path: file.path,
+      }));
+
+      // Configure the email
+      const mailOptions = {
+          from: 'torzsdb.bugreport@gmail.com',
+          to: 'torzsdb.bugreport@gmail.com',
+          subject: `Bug Report: ${title}`,
+          text: `Description:\n\n${description}`,
+          attachments,
+      };
+
+      // Send the email
+      await transporter.sendMail(mailOptions);
+
+      // Cleanup uploaded files
+      req.files.forEach(file => fs.unlinkSync(file.path));
+
+      res.status(200).send('Bug report submitted successfully!');
   } catch (error) {
-    console.error('Error sending email:', error);
-    res.status(500).send('Failed to send email');
-  } finally {
-    // Remove the uploaded file from the server after sending the email
-    if (req.file) {
-      fs.unlink(req.file.path, (err) => {
-        if (err) console.error('Error removing file:', err);
-      });
-    }
+      console.error('Error sending email:', error);
+      res.status(500).send('Failed to send bug report.');
   }
 });
 

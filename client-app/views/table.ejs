@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tantárgyweb</title>
+  <style>
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+    }
+    th, td {
+      padding: 10px;
+      border: 1px solid #ddd;
+      text-align: left;
+    }
+    th {
+      background-color: #f4f4f4;
+    }
+  </style>
+</head>
+<body>
+  <h1>Tantárgyweb</h1>
+  <table>
+    <thead>
+      <tr>
+        <th>Birth Name</th>
+        <th>Neptune ID</th>
+        <th>Email</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% data.forEach(row => { %>
+        <tr>
+          <td><%= row.birthname %></td>
+          <td><%= row.neptune_id %></td>
+          <td><%= row.email %></td>
+        </tr>
+      <% }); %>
+    </tbody>
+  </table>
+</body>
+</html>
