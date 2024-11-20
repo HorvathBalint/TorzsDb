@@ -8,10 +8,6 @@
   height: 100vh;
 }
 
-.customicon {
-  filter: invert(1); /* Inverts black to white */
-}
-
 /* Sidebar Styling */
 .sidebar {
   background-color: #242943;
@@ -168,7 +164,36 @@ a {
 }
 
 .hero-container2 input{
-  font-size: 50px;
+  font-size: 25px;
+}
+
+.hero-container2 button {
+  border-radius: 8px;
+  font-size: 25px;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+}
+
+.user-grid{
+  display: grid;
+  grid-template-columns: 1fr auto; /* Two equal columns */
+  gap: 20px;
+  padding-right: 30px;
+  height: 75px;
+  align-items: center;
+}
+
+.user-grid div{
+  height: 60px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 24px;
+}
+
+.user-grid div:hover{
+  background-color: #3a3e52;
 }
 
 .btn-container{
@@ -287,9 +312,6 @@ input[type="checkbox"]:checked + .check-card-btn {
   color: white;
 }
 
-.hero-container2 form {
-  max-width: 170vh;
-}
 .form-container h1 {
   font-size: 1.5rem;
   margin-bottom: 20px;
@@ -301,7 +323,7 @@ input[type="checkbox"]:checked + .check-card-btn {
 
 .emailcard{
   padding:15px;
-  margin-right: 20px;
+  margin: 20px;
   font-size: larger;
   color: #50adc9;
 }

@@ -7,6 +7,7 @@ const PORT = 3002;
 // API configuration
 const API_BASE_URL = 'http://localhost:3000'; // Replace with your API server URL
 const API_KEY = 'T8@zP1q!Xm#9wB6$'; // Use a valid API key
+const API_KEY_INDEX = 0;
 
 // Set EJS as the templating engine
 app.set('view engine', 'ejs');
@@ -19,6 +20,7 @@ app.get('/', async (req, res) => {
     const response = await axios.get(`${API_BASE_URL}/protected`, {
       headers: {
         'x-api-key': API_KEY,
+        'index': API_KEY_INDEX,
       },
     });
 

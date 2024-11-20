@@ -80,17 +80,22 @@ db.connect();
 const validApiKeys = ["T8@zP1q!Xm#9wB6$"]; 
 
 // Middleware a hozzáférés ellenőrzéséhez
-const accessControl = (req, res, next) => {
-    const apiKey = req.header('x-api-key'); // Az API kulcs a fejlécben
-    if (validApiKeys.includes(apiKey)) {
-        next(); // Tovább engedi a kérést
-    } else {
-        res.status(403).json({ error: "Hozzáférés megtagadva" }); // Hozzáférés elutasítva
-    }
+const accessControl = (validIndex) => {
+  return (req, res, next) => {
+      const index = req.header('index'); // Retrieve the index from the request header
+      const password = req.header('x-api-key'); // Retrieve the password from the request header
+      
+      // Validate the index and password
+      if (index==validIndex && password==validApiKeys[index]) {
+          next(); // Allow the request to proceed if credentials are valid
+      } else {
+          res.status(403).json({ error: "Hozzáférés megtagadva: Érvénytelen hitelesítés" }); // Deny access otherwise
+      }
+  };
 };
 
 // Védett végpont
-app.get('/protected', accessControl, async (req, res) => {
+app.get('/protected', accessControl(0), async (req, res) => {
   try {
     const results = await db.query(
       `SELECT co_workers.birthname, students.neptune_id, email

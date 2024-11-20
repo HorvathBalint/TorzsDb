@@ -51,25 +51,47 @@
         </div>
 
         <!-- Container for multiple tables and their respective checkboxes -->
-        <div class="columns-container" id="columnsContainer">
-            <% tableNames.forEach(function(tableName) { 
-                const displayName = tableNameMap[tableName] || tableName; // Use the display name if it exists
+    <div class="columns-container" id="columnsContainer">
+    <% 
+    const columnNameMap = {
+    "id": "Azonosító",
+    "name": "Név",
+    "birthname": "Születési név",
+    "tax_number": "Adóazonosító jel",
+    "mothers_name": "Anyja neve",
+    "birthplace": "Születési hely",
+    "birth_date": "Születési dátum",
+    "id_number": "Törzs szám",
+    "organizational_unit": "Szervezeti egység",
+    "post": "Beosztás",
+    "email_private": "Privát e-mail",
+    "email_sze": "SZE e-mail",
+    "phone_number": "Telefonszám",
+    "surname": "Vezetéknév",
+    "firstname": "Keresztnév",
+    "neptune_id": "Neptun kód",
+    "email": "E-mail",
+    "student_status": "Hallgatói státusz"
+};
+    %>
+    <% tableNames.forEach(function(tableName) { 
+        const displayName = tableNameMap[tableName] || tableName; // Use the display name if it exists
+    %>
+        <div id="<%= tableName %>-columns" class="table-section col-md-4" style="display: none; width: 30%;">
+            <h2><%= displayName %> adatai:</h2>
+            <input type="checkbox" id="<%= tableName %>-select-all" class="select-all" onchange="toggleAllColumns('<%= tableName %>')">
+            <label for="<%= tableName %>-select-all">Összes kijelölése</label><br>
+            
+            <% tablesAndColumns.forEach(function(row) { 
+                if (row.table_name === tableName && row.column_name !== "id") { // Skip "id" column
+                    const columnDisplayName = columnNameMap[row.column_name] || row.column_name; // Translate column name if mapping exists
             %>
-                <div id="<%= tableName %>-columns" class="table-section col-md-4" style="display: none; width: 30%;">
-                    <h2><%= displayName %> adatai:</h2>
-                    <input type="checkbox" id="<%= tableName %>-select-all" class="select-all" onchange="toggleAllColumns('<%= tableName %>')">
-                    <label for="<%= tableName %>-select-all">Összes kijelölése</label><br>
-                    
-                    <% tablesAndColumns.forEach(function(row) { 
-                        if (row.table_name === tableName) { 
-                            const columnDisplayName = row.column_name; // Add your mapping for columns if needed
-                    %>
-                            <input type="checkbox" class="column-checkbox" onchange="checkButtonVisibility()" data-table="<%= tableName %>" id="<%= row.column_name %>" name="<%= row.column_name %>">
-                            <label for="<%= row.column_name %>"><%= columnDisplayName %></label><br>
-                    <% } } ); %>
-                </div>
-            <% }); %>
+                    <input type="checkbox" class="column-checkbox" onchange="checkButtonVisibility()" data-table="<%= tableName %>" id="<%= row.column_name %>" name="<%= row.column_name %>">
+                    <label for="<%= row.column_name %>"><%= columnDisplayName %></label><br>
+            <% } }); %>
         </div>
+    <% }); %>
+</div>
 
         <br><br>
 
