@@ -3,158 +3,97 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <link rel="stylesheet" href="/HomePage.css">
-    <title>Lekérdezés generáló</title>
+    <title>Request Management</title>
+    <link rel="stylesheet" href="styles.css"> <!-- Add your custom styles -->
 </head>
-<body style="background-color: #f1f1f1;">
-    <header class="d-flex flex-wrap justify-content-center py-3 border-bottom container-fluid header-color header">
-        <a href="/homepage" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-dark text-decoration-none">
-            <img src="icon-1.png" width="55" height="70" class="p-2"/>
-            <span class="text-color">Törzsadatbázis</span>
-        </a>
-        <div class="text-end">
-            <button type="button" class="btn-1 text-color">Felhasználó</button>
-        </div>
-    </header>
-    
-    <div style="margin: 10px; justify-content: center;">
-        <h1 style="align-items: center; text-align: center;">Lekérdezés készítő</h1>
-
-        <!-- Checkbox for each table -->
-        <div style="align-items: center; text-align: center;" id="tableCheckboxes" class="mb-3">
-            <% 
-            const tableNameMap={
-                "co_workers":"Munkatársak",
-                "students":"Diákok",
-            };
-            let tableNames = new Set();
-            tablesAndColumns.forEach(function(row) { 
-                tableNames.add(row.table_name);
-            });
-            %>
-            <div role="group">
-                <% tableNames.forEach(function(tableName) { 
-                    const displayName = tableNameMap[tableName] || tableName; // Use the display name if it exists
-                %>
-                    <input type="checkbox" id="<%= tableName %>-checkbox" onchange="toggleColumns('<%= tableName %>')" class="btn-check" autocomplete="off">
-                    <label class="check-card-btn" for="<%= tableName %>-checkbox"><%= displayName %></label>
-                <% }); %>
-            </div>
-        </div>
-
-        <!-- Container for multiple tables and their respective checkboxes -->
-        <div class="columns-container" id="columnsContainer">
-            <% tableNames.forEach(function(tableName) { 
-                const displayName = tableNameMap[tableName] || tableName; // Use the display name if it exists
-            %>
-                <div id="<%= tableName %>-columns" class="table-section col-md-4" style="display: none; width: 30%;">
-                    <h2><%= displayName %> tábla oszlopai:</h2>
-                    <input type="checkbox" id="<%= tableName %>-select-all" class="select-all" onchange="toggleAllColumns('<%= tableName %>')">
-                    <label for="<%= tableName %>-select-all">Select All</label><br>
-                    
-                    <% tablesAndColumns.forEach(function(row) { 
-                        if (row.table_name === tableName) { 
-                            const columnDisplayName = row.column_name; // Add your mapping for columns if needed
-                    %>
-                            <input type="checkbox" class="column-checkbox" onchange="checkButtonVisibility()" data-table="<%= tableName %>" id="<%= row.column_name %>" name="<%= row.column_name %>">
-                            <label for="<%= row.column_name %>"><%= columnDisplayName %></label><br>
-                    <% } } ); %>
-                </div>
-            <% }); %>
-        </div>
-
-        <br><br>
-
-        <div id="button-container" style="display: none; text-align: center;">
-            <a href="/download">
-                <button type="button" class="btn btn-success" onclick="generateArray()">Excel tábla generálás</button>
-            </a>
+<body>
+    <div class="container">
+        <h1>Request Management</h1>
+        <div id="requestsContainer">
+            <!-- Requests will be loaded dynamically here -->
         </div>
     </div>
-    
+
     <script>
-        function toggleColumns(tableName) {
-            const columnsDiv = document.getElementById(`${tableName}-columns`);
-            const checkbox = document.getElementById(`${tableName}-checkbox`);
-
-            // Show or hide the columns based on the checkbox state
-            if (checkbox.checked) {
-                columnsDiv.style.display = "block";
-            } else {
-                columnsDiv.style.display = "none";
-                
-                // Uncheck all checkboxes in this table section when hiding
-                const columnCheckboxes = columnsDiv.querySelectorAll('.column-checkbox');
-                columnCheckboxes.forEach(colCheckbox => colCheckbox.checked = false);
+        // Fetch and display requests
+        async function loadRequests() {
+            const response = await fetch('/list-requests');
+            if (!response.ok) {
+                alert("Failed to load requests.");
+                return;
             }
 
-            checkButtonVisibility(); // Check if any column is selected
-        }
+            const requests = await response.json(); // Array of request file names
+            const container = document.getElementById('requestsContainer');
+            container.innerHTML = ""; // Clear existing content
 
-        function toggleAllColumns(tableName) {
-            const selectAllCheckbox = document.getElementById(`${tableName}-select-all`);
-            const columnCheckboxes = document.querySelectorAll(`#${tableName}-columns .column-checkbox`);
+            if (requests.length === 0) {
+                container.innerHTML = "<p>No requests found.</p>";
+                return;
+            }
 
-            // Check or uncheck all checkboxes based on the state of the select all checkbox
-            columnCheckboxes.forEach(checkbox => {
-                checkbox.checked = selectAllCheckbox.checked;
+            requests.forEach(fileName => {
+                const requestDiv = document.createElement('div');
+                requestDiv.className = "request-item";
+
+                requestDiv.innerHTML = `
+                    <p><strong>Request File:</strong> ${fileName}</p>
+                    <button onclick="reactToRequest('${fileName}', 'accepted')">Accept</button>
+                    <button onclick="reactToRequest('${fileName}', 'denied')">Deny</button>
+                `;
+
+                container.appendChild(requestDiv);
             });
-
-            checkButtonVisibility(); // Check if any column is selected
         }
 
-        // Function to check if any column is selected and show the button accordingly
-        function checkButtonVisibility() {
-            const selectedColumns = document.querySelectorAll('.column-checkbox:checked');
-            const buttonContainer = document.getElementById('button-container');
-            
-            if (selectedColumns.length > 0) {
-                buttonContainer.style.display = 'block'; // Show the button
-            } else {
-                buttonContainer.style.display = 'none'; // Hide the button
-            }
-        }
-
-        function generateArray() {
-            const queries = []; // To store the query strings for each table
-
-            // Find all checkboxes
-            const allCheckboxes = document.querySelectorAll('.column-checkbox');
-            
-            // Organize columns by table
-            const tableColumns = {};
-            allCheckboxes.forEach(checkbox => {
-                if (checkbox.checked) {
-                    const tableName = checkbox.getAttribute('data-table');
-                    if (!tableColumns[tableName]) {
-                        tableColumns[tableName] = [];
-                    }
-                    tableColumns[tableName].push(checkbox.id);
-                }
-            });
-
-            // Generate queries for each table
-            for (const [table, columns] of Object.entries(tableColumns)) {
-                if (columns.length > 0) {
-                    const queryStr = `SELECT ${columns.join(', ')} FROM ${table}`;
-                    queries.push(queryStr);
-                }
-            }
-
-            // Now `queries` array contains all query strings for selected columns of each table
-            console.log(queries); // For debugging purposes
-
-            // Send query strings to the backend
-            fetch('/submit-string', {
+        // React to a request (accept or deny)
+        async function reactToRequest(fileName, action) {
+            const response = await fetch('/react-to-request', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(queries), // Send as JSON
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ fileName, action })
             });
-        }
-    </script>
 
+            if (response.ok) {
+                alert(`Request "${fileName}" has been ${action}.`);
+                loadRequests(); // Reload the requests list
+            } else {
+                alert(`Failed to ${action} the request. Please try again.`);
+            }
+        }
+        async function loadRequests() {
+    const response = await fetch('/list-requests');
+    if (!response.ok) {
+        alert("Failed to load requests.");
+        return;
+    }
+
+    const requests = await response.json(); // Array of { fileName, content }
+    const container = document.getElementById('requestsContainer');
+    container.innerHTML = ""; // Clear existing content
+
+    if (requests.length === 0) {
+        container.innerHTML = "<p>No requests found.</p>";
+        return;
+    }
+
+    requests.forEach(({ fileName, content }) => {
+        const requestDiv = document.createElement('div');
+        requestDiv.className = "request-item";
+
+        requestDiv.innerHTML = `
+            <p><strong>Request File:</strong> ${fileName}</p>
+            <pre><strong>Content:</strong>\n${content}</pre>
+            <button onclick="reactToRequest('${fileName}', 'accepted')">Accept</button>
+            <button onclick="reactToRequest('${fileName}', 'denied')">Deny</button>
+        `;
+
+        container.appendChild(requestDiv);
+    });
+}
+
+        // Initial load
+        loadRequests();
+    </script>
 </body>
 </html>

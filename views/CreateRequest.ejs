@@ -103,7 +103,7 @@
         <br><br>
 
         <div id="button-container" style="display: none;">
-                <button style=" font-size: 25px; padding: 10px;" type="button" class="btn btn-success" onclick="generateArray()">Excel tábla letöltése</button>
+                <button style=" font-size: 25px; padding: 10px;" type="button" class="btn btn-success" onclick="generateRequest()">Igénylés elküldése</button>
         </div>
     </div>
 </div>
@@ -151,46 +151,54 @@
             }
         }
 
-        function generateArray() {
-            const queries = []; // To store the query strings for each table
-
-            // Find all checkboxes
-            const allCheckboxes = document.querySelectorAll('.column-checkbox');
-            
-            // Organize columns by table
-            const tableColumns = {};
-            allCheckboxes.forEach(checkbox => {
-                if (checkbox.checked) {
-                    const tableName = checkbox.getAttribute('data-table');
-                    if (!tableColumns[tableName]) {
-                        tableColumns[tableName] = [];
-                    }
-                    tableColumns[tableName].push(checkbox.id);
-                }
-            });
-
-            // Generate queries for each table
-            for (const [table, columns] of Object.entries(tableColumns)) {
-                if (columns.length > 0) {
-                    const queryStr = `SELECT ${columns.join(', ')} FROM ${table}`;
-                    queries.push(queryStr);
-                }
+        function generateRequest() {
+    const allCheckboxes = document.querySelectorAll('.column-checkbox');
+    
+    // Organize columns by table
+    const tableColumns = {};
+    allCheckboxes.forEach(checkbox => {
+        if (checkbox.checked) {
+            const tableName = checkbox.getAttribute('data-table');
+            if (!tableColumns[tableName]) {
+                tableColumns[tableName] = [];
             }
-
-            // Now `queries` array contains all query strings for selected columns of each table
-            console.log(queries); // For debugging purposes
-
-            // Send query strings to the backend
-            fetch('/submit-string', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(queries), // Send as JSON
-            });
-            setTimeout(() => {
-                window.location.href = '/download';
-            }, 1500);
+            tableColumns[tableName].push(checkbox.id);
         }
+    });
+
+    // If no columns are selected, alert the user
+    if (Object.keys(tableColumns).length === 0) {
+        alert("No data selected!");
+        return;
+    }
+
+    // Prepare log content
+    const logContent = Object.entries(tableColumns)
+        .map(([table, columns]) => `Table: ${table}\nColumns: ${columns.join(", ")}\n`)
+        .join("\n");
+
+    // Generate a timestamp for the file name
+    const now = new Date();
+    const timestamp = now.toISOString().replace(/[:.]/g, "-");
+    const fileName = `request_${timestamp}.log`;
+
+    // Send log content to the server
+    fetch('/save-request', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ fileName, logContent })
+    })
+    .then(response => {
+        if (response.ok) {
+            alert(`Adatigénylés elküldve!`);
+        } else {
+            alert("Failed to save the request. Please try again.");
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert("An error occurred. Please check the console for details.");
+    });
+}
     </script>
 </html>

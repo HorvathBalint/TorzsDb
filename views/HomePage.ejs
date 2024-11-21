@@ -20,7 +20,10 @@
             </a>
             <div class="text-end">
                 <div class="user-grid">
-                    <div>Felhasználó</div>
+                    <div class="container-card">
+                        <span>Rácz Patrik</span>
+                        <span>(Admin)</span>
+                    </div>
                     <div><i class="bi bi-power" style="padding: 20px;"></i></div>
                 </div>
             </div>
@@ -28,7 +31,8 @@
 
         <!-- Sidebar -->
         <div class="sidebar" style="padding-top: 30px;">
-            <a href="/querrymaker"><i class="bi bi-table"></i> Lekérdezés tervező</a>
+            <a href="/requestdata"><i class="bi bi-building-up"></i>Adat igénylés</a>
+            <a href="/querrymaker"><i class="bi bi-table"></i>Lekérdezés tervező</a>
             <a href="/upload"><i class="bi bi-cloud-arrow-up"></i>Tábla feltöltés</a>
             <a href="/bugreport"><i class="bi bi-bug"></i>Hiba bejelentése</a>
             <a href="/help" target="_blank"><i class="bi bi-info-circle"></i>Súgó</a>
@@ -38,6 +42,12 @@
         <div class="main-content">
             <div class="title"><h2 style="font-weight: bold;">Kezdőlap</h2></div>
             <div class="hero-container d-flex flex-wrap">
+                <div><a href="/requestdata">
+                    <button class="btn card-btn container-card">
+                        <i class="bi bi-building-up"></i>
+                        <span>Adat igénylés</span>
+                    </button>
+                </a></div>
                 <div><a href="/querrymaker">
                     <button class="btn card-btn container-card">
                         <i class="bi bi-table"></i>

@@ -82,11 +82,8 @@ const validApiKeys = ["T8@zP1q!Xm#9wB6$"];
 // Middleware a hozzáférés ellenőrzéséhez
 const accessControl = (validIndex) => {
   return (req, res, next) => {
-      const index = req.header('index'); // Retrieve the index from the request header
       const password = req.header('x-api-key'); // Retrieve the password from the request header
-      
-      // Validate the index and password
-      if (index==validIndex && password==validApiKeys[index]) {
+      if (password==validApiKeys[validIndex]) {
           next(); // Allow the request to proceed if credentials are valid
       } else {
           res.status(403).json({ error: "Hozzáférés megtagadva: Érvénytelen hitelesítés" }); // Deny access otherwise
@@ -423,13 +420,12 @@ app.get('/bugreport', async (req, res) => {
 });
 
 app.get('/test', async (req, res) => {
-  const tablesAndColumns = await getTablesAndColumns();
-  res.render('test.ejs', { tablesAndColumns });
+  res.render('test.ejs');
 });
 
-app.get('/QM', async (req, res) => {
+app.get('/requestdata', async (req, res) => {
   const tablesAndColumns = await getTablesAndColumns();
-  res.render('QuerryMaker', { tablesAndColumns });
+  res.render('CreateRequest.ejs', { tablesAndColumns });
 });
 
 app.get('/querrymaker', async (req, res) => {
@@ -442,6 +438,7 @@ app.post('/submit-string', (req, res) => {
   console.log(receivedString+'in the app.js');
   printToXls(receivedString);  // Use the received string to generate an XLS file
 });
+
 
 // Endpoint to handle email sending
 // Endpoint to handle form submission
@@ -473,6 +470,76 @@ app.post('/send-email', upload.array('images', 10), async (req, res) => {
       console.error('Error sending email:', error);
       res.status(500).send('Failed to send bug report.');
   }
+});
+// Endpoint to save the request file
+app.post('/save-request', (req, res) => {
+  const { fileName, logContent } = req.body;
+
+  if (!fileName || !logContent) {
+      return res.status(400).send('Invalid data.');
+  }
+
+  // Define the requests folder
+  const requestsFolder = path.resolve('requests');
+  if (!fs.existsSync(requestsFolder)) {
+      fs.mkdirSync(requestsFolder, { recursive: true }); // Create folder if it doesn't exist
+  }
+
+  // Save the log file
+  const filePath = path.join(requestsFolder, fileName);
+  fs.writeFile(filePath, logContent, 'utf8', (err) => {
+      if (err) {
+          console.error(err);
+          return res.status(500).send('Failed to save the request.');
+      }
+      res.send('Request saved successfully.');
+  });
+});
+
+// Folder containing the request files
+const requestsFolder = path.resolve('requests');
+
+// Endpoint to list request files
+app.get('/list-requests', (req, res) => {
+  fs.readdir(requestsFolder, (err, files) => {
+      if (err) {
+          console.error(err);
+          return res.status(500).send('Failed to list requests.');
+      }
+
+      // Filter out 'accepted_' and 'denied_' files
+      const requestFiles = files.filter(file => file.endsWith('.log') && 
+          !file.startsWith('accepted_') && !file.startsWith('denied_'));
+
+      // Read the contents of each file
+      const requests = requestFiles.map(fileName => {
+          const filePath = path.join(requestsFolder, fileName);
+          const content = fs.readFileSync(filePath, 'utf-8'); // Read file contents
+          return { fileName, content };
+      });
+
+      res.json(requests); // Send file names and contents to the client
+  });
+});
+// Endpoint to react to a request
+app.post('/react-to-request', (req, res) => {
+    const { fileName, action } = req.body;
+
+    if (!fileName || !['accepted', 'denied'].includes(action)) {
+        return res.status(400).send('Invalid data.');
+    }
+
+    const oldPath = path.join(requestsFolder, fileName);
+    const newFileName = `${action}_${fileName}`;
+    const newPath = path.join(requestsFolder, newFileName);
+
+    fs.rename(oldPath, newPath, (err) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).send('Failed to process the request.');
+        }
+        res.send('Request processed successfully.');
+    });
 });
 
 // Utility function to convert Excel serial date to JavaScript Date
