@@ -256,6 +256,81 @@ const getTablesAndColumns = async () => {
   }
 };
 
+// Function to get request log files from the "requests" folder
+const getRequestLogFiles = (folderPath) => {
+  try {
+      const files = fs.readdirSync(folderPath);
+      return files.filter(file => file.startsWith('accepted'));
+  } catch (err) {
+      console.error('Error reading requests folder:', err);
+      return [];
+  }
+};
+
+// Function to read and parse a single request log file
+const parseRequestLogFile = (filePath) => {
+  try {
+      const content = fs.readFileSync(filePath, 'utf8');
+      return parseRequestLog(content); // Use the existing parsing logic
+  } catch (err) {
+      console.error(`Error reading file ${filePath}:`, err);
+      return [];
+  }
+};
+
+// Modified filter function to integrate file handling
+const filterTablesAndColumnsFromRequests = (allTablesAndColumns, requestFolderPath) => {
+  const requestLogFiles = getRequestLogFiles(requestFolderPath);
+  const requestData = [];
+
+  // Process each request log file
+  requestLogFiles.forEach(file => {
+      const filePath = path.join(requestFolderPath, file);
+      const parsedData = parseRequestLogFile(filePath);
+      requestData.push(...parsedData);
+  });
+
+  // Flatten the request data into a map for quick lookup
+  const validEntries = {};
+  requestData.forEach(({ table, columns }) => {
+      if (!validEntries[table]) validEntries[table] = new Set();
+      columns.forEach(column => validEntries[table].add(column));
+  });
+
+  // Filter the array to include only valid tables and columns
+  const filteredData = allTablesAndColumns.filter(({ table_name, column_name }) => {
+      return (
+          validEntries[table_name] && validEntries[table_name].has(column_name)
+      );
+  });
+
+  return filteredData;
+};
+
+// Utility to parse the request log content
+const parseRequestLog = (logFile) => {
+  const lines = logFile.trim().split('\n');
+  const parsedData = [];
+
+  let currentTable = null;
+
+  lines.forEach(line => {
+      if (line.startsWith('Tábla:')) {
+          // Extract table name
+          currentTable = line.replace('Tábla:', '').trim();
+          parsedData.push({ table: currentTable, columns: [] });
+      } else if (line.startsWith('Adatok:')) {
+          // Extract column names
+          const columns = line.replace('Adatok:', '').split(',').map(col => col.trim());
+          if (currentTable) {
+              parsedData[parsedData.length - 1].columns.push(...columns);
+          }
+      }
+  });
+
+  return parsedData;
+};
+
 async function printToXls(queries) {
   const workbook = new ExcelJS.Workbook();
 
@@ -419,8 +494,8 @@ app.get('/bugreport', async (req, res) => {
   res.render('Bugreport.ejs');
 });
 
-app.get('/test', async (req, res) => {
-  res.render('test.ejs');
+app.get('/managerequests', async (req, res) => {
+  res.render('ManageRequests.ejs');
 });
 
 app.get('/requestdata', async (req, res) => {
@@ -429,8 +504,10 @@ app.get('/requestdata', async (req, res) => {
 });
 
 app.get('/querrymaker', async (req, res) => {
-  const tablesAndColumns = await getTablesAndColumns();
-  res.render('newQuerry.ejs', { tablesAndColumns });
+  const requestsFolder='./requests';
+  const allTablesAndColumns = await getTablesAndColumns();
+  const tablesAndColumns=filterTablesAndColumnsFromRequests(allTablesAndColumns, requestsFolder);
+  res.render('newQuerry.ejs', { tablesAndColumns}); 
 });
   
 app.post('/submit-string', (req, res) => {
