@@ -62,6 +62,28 @@
                 alert(`Failed to ${action} the request. Please try again.`);
             }
         }
+        const NameMap = {
+    "co_workers":"Munkatársak",
+    "students":"Diákok",
+    "testtable":"Tesztábla",
+    "name": "Név",
+    "birthname": "Születési név",
+    "tax_number": "Adóazonosító jel",
+    "mothers_name": "Anyja neve",
+    "birthplace": "Születési hely",
+    "birth_date": "Születési dátum",
+    "id_number": "Törzs szám",
+    "organizational_unit": "Szervezeti egység",
+    "post": "Beosztás",
+    "email_private": "Privát e-mail",
+    "email_sze": "SZE e-mail",
+    "phone_number": "Telefonszám",
+    "surname": "Vezetéknév",
+    "firstname": "Keresztnév",
+    "neptune_id": "Neptun kód",
+    "email": "E-mail",
+    "student_status": "Hallgatói státusz"
+};
         async function loadRequests() {
     const response = await fetch('/list-requests');
     if (!response.ok) {
@@ -82,10 +104,16 @@
         const requestDiv = document.createElement('div');
         requestDiv.className = "request-item";
 
+        let translatedContent = content;
+    for (const [key, value] of Object.entries(NameMap)) {
+        const regex = new RegExp(`\\b${key}\\b`, 'g'); // Match whole words only
+        translatedContent = translatedContent.replace(regex, value);
+    }
+
         requestDiv.innerHTML = `
-        <div class="table-section" style="margin-right:20px">
+        <div class="table-section" style="margin-right:20px; font-size:larger;">
             <p><strong>${fileName}</strong></p>
-            <pre><strong>Igényelt adatok:</strong>\n${content}</pre>
+            <pre><strong>Igényelt adatok:</strong>\n${translatedContent}</pre>
             <button class="btn btn-success" onclick="reactToRequest('${fileName}', 'accepted')">Elfogad</button>
             <span style="padding: 15px"></span>
             <button class="btn btn-danger" onclick="reactToRequest('${fileName}', 'denied')">Elutasít</button>
