@@ -40,7 +40,7 @@
         </div>
         <div class="main-content">
             <div class="title"><h2 style="font-weight: bold;">Adatigények kezelése</h2></div>
-            <div id="requestsContainer" class="hero-container2 d-flex flex-wrap">
+            <div id="requestsContainer" class="hero-container2">
                 
             </div>
         </div>
@@ -72,7 +72,7 @@
     "mothers_name": "Anyja neve",
     "birthplace": "Születési hely",
     "birth_date": "Születési dátum",
-    "id_number": "Törzs szám",
+    "id_number": "Törzsszám",
     "organizational_unit": "Szervezeti egység",
     "post": "Beosztás",
     "email_private": "Privát e-mail",
@@ -96,7 +96,7 @@
     container.innerHTML = ""; // Clear existing content
 
     if (requests.length === 0) {
-        container.innerHTML = "<p>Nem találhatóak adatigénylések.</p>";
+        container.innerHTML = "<h4>Nem találhatóak adatigénylések.</h4>";
         return;
     }
 
