@@ -100,6 +100,10 @@
         </div>
     <% }); %>
 </div>
+                        <div class="mb-3" style="margin-right:20px">
+                            <label for="description" class="form-label"><b>Leírás</b> (opcionális)</label>
+                            <textarea class="form-control form-textarea" id="description" name="description" maxlength="65535"></textarea>
+                        </div>
 
         <br><br>
 
@@ -152,8 +156,10 @@
             }
         }
 
-        function generateRequest() {
+    function generateRequest() {
     const allCheckboxes = document.querySelectorAll('.column-checkbox');
+    const description = document.getElementById('description').value;
+    console.log(description);
     
     // Organize columns by table
     const tableColumns = {};
@@ -174,9 +180,11 @@
     }
 
     // Prepare log content
-    const logContent = Object.entries(tableColumns)
+    const tableDataContent = Object.entries(tableColumns)
         .map(([table, columns]) => `Tábla: ${table}\nAdatok: ${columns.join(", ")}\n`)
         .join("\n");
+
+    const logContent = `${tableDataContent}\n<b>Leírás:</b>\n${description || "Nincs megadva."}`;
 
     // Generate a timestamp for the file name
     const now = new Date();

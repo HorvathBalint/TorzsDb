@@ -13,7 +13,7 @@
   background-color: #242943;
   color: white;
   padding: 0;
-  overflow-y: auto;
+  overflow: hidden;
   grid-area: sidebar;
 
 }
@@ -157,8 +157,9 @@ a {
   background-color: #f1f1f1;
   height: 100vh;
   width: 100%;
-  overflow: hidden;
+  overflow-y: scroll;
   padding-left: 20px;
+  padding-bottom: 170px;
 }
 
 .hero-container2 input{
