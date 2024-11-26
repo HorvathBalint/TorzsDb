@@ -15,43 +15,6 @@ import jwt from 'jsonwebtoken'; // Assuming JWT is used for authentication
 import cors from 'cors';
 import dotenv from 'dotenv';
 import nodemailer from 'nodemailer';
-// Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { getAuth} from "firebase/auth";
-import { 
-  createUserWithEmailAndPassword, 
-  signInWithEmailAndPassword, 
-  signOut, 
-  onAuthStateChanged 
-} from "firebase/auth";
-
-const app = express();
-const port = 3000;
-
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.text());
-app.use(express.static("views"));
-app.use(express.static("public"));
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
-//app.use(verifySSHKey);
-app.set('view engine', 'ejs');
-
-const firebaseConfig = {
-  apiKey: "AIzaSyDQpPWooCxFxDGaIS6dCviwABdOdI9-Uf0",
-  authDomain: "torzsdb.firebaseapp.com",
-  projectId: "torzsdb",
-  storageBucket: "torzsdb.firebasestorage.app",
-  messagingSenderId: "148636287158",
-  appId: "1:148636287158:web:4ef9b7f8cbcb9a3de96617",
-  measurementId: "G-5YLY4XTXSK"
-};
-
-// Initialize Firebase
-const firebaseApp = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-export { auth };
 
 // Configure dotenv
 dotenv.config();
@@ -68,84 +31,18 @@ const transporter = nodemailer.createTransport({
 });
 
 
-const authenticateToken = async (req, res, next) => {
-  const idToken = req.headers.authorization?.split('Bearer ')[1];
+const app = express();
+const port = 3000;
 
-  if (!idToken) {
-    return res.status(401).send({ error: 'Unauthorized' });
-  }
-
-  try {
-    const decodedToken = await admin.auth().verifyIdToken(idToken);
-    req.user = decodedToken;
-    next();
-  } catch (error) {
-    return res.status(403).send({ error: 'Token is invalid or expired' });
-  }
-};
-
-const signupForm = document.getElementById("signup-form");
-signupForm.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const email = document.getElementById("signup-email").value;
-  const password = document.getElementById("signup-password").value;
-
-  try {
-    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-    alert(`User signed up: ${userCredential.user.email}`);
-  } catch (error) {
-    alert(`Error: ${error.message}`);
-  }
-});
-
-// Login Function
-const loginForm = document.getElementById("login-form");
-loginForm.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const email = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
-
-  try {
-    const userCredential = await signInWithEmailAndPassword(auth, email, password);
-    alert(`User logged in: ${userCredential.user.email}`);
-    document.getElementById("logout").style.display = "block";
-  } catch (error) {
-    alert(`Error: ${error.message}`);
-  }
-});
-
-// Logout Function
-const logoutButton = document.getElementById("logout");
-logoutButton.addEventListener("click", async () => {
-  try {
-    await signOut(auth);
-    alert("User logged out");
-    logoutButton.style.display = "none";
-  } catch (error) {
-    alert(`Error: ${error.message}`);
-  }
-});
-
-// Monitor Authentication State
-onAuthStateChanged(auth, (user) => {
-  if (user) {
-    console.log(`User is logged in: ${user.email}`);
-  } else {
-    console.log("User is logged out");
-  }
-});
-
-signInWithEmailAndPassword(auth, email, password)
-  .then((userCredential) => {
-    // User signed in
-    const user = userCredential.user;
-    console.log("Signed in as:", user.email);
-  })
-  .catch((error) => {
-    console.error(error.message);
-  });
-
-module.exports = authenticateToken;
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.text());
+app.use(express.static("views"));
+app.use(express.static("public"));
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+//app.use(verifySSHKey);
+app.set('view engine', 'ejs');
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
@@ -590,7 +487,7 @@ app.get('/homepage', async (req, res) => {
 });
 
 app.get('/', async (req, res) => {
-  res.render('login.ejs');
+  res.render('HomePage.ejs');
 });
 
 app.get('/bugreport', async (req, res) => {
