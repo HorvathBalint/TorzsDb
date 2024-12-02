@@ -55,7 +55,7 @@ app.use(cors({
   origin: 'http://localhost:3001' // Replace with the front-end server's address
 }));
 
-const sftp= new Client();
+const sftp= new Client(); //SFTP kliens példányosítása
 
 const config={
   host: '192.168.1.220',
@@ -64,7 +64,7 @@ const config={
   password: 'taprick07'
 };
 
-sftp.connect(config);
+sftp.connect(config); //kliens csatlakoztatása a szerverre
 
 const db = new pg.Client({
     user: 'postgres', // PostgreSQL felhasználónév
@@ -104,48 +104,6 @@ app.get('/protected', accessControl(0), async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
-
-// // Middleware to authenticate requests using JWT
-// function authenticateToken(req, res, next) {
-//   const authHeader = req.headers['authorization'];
-//   const token = authHeader && authHeader.split(' ')[1];
-
-//   if (!token) return res.sendStatus(401); // Unauthorized
-
-//   jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
-//     if (err) return res.sendStatus(403); // Forbidden
-//     req.user = user;
-//     next();
-//   });
-// }
-
-//const publicKey = fs.readFileSync('./ssh_keys/id_rsa.pub', 'utf8');
-
-// function verifySSHKey(req, res, next) {
-//   const clientSignature = req.headers['x-client-signature']; // Signature from the client
-//   const clientMessage = req.headers['x-client-message']; // Message signed by the client
-
-//   if (!clientSignature || !clientMessage) {
-//       return res.status(401).send('Unauthorized: Missing signature or message');
-//   }
-
-//   // Verify the signature using the public key
-//   const pki = forge.pki;
-//   const publicKeyObject = pki.publicKeyFromPem(publicKey);
-//   const md = forge.md.sha256.create();
-//   md.update(clientMessage, 'utf8');
-
-//   const isVerified = publicKeyObject.verify(
-//       md.digest().bytes(),
-//       forge.util.decode64(clientSignature)
-//   );
-
-//   if (isVerified) {
-//       next(); // Signature is valid, proceed to the next middleware/route
-//   } else {
-//       res.status(401).send('Unauthorized: Invalid signature');
-//   }
-// }
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {

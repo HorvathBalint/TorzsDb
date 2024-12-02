@@ -28,17 +28,17 @@
         <a href="/requestdata"><i class="bi bi-database-add"></i>Adatigénylés</a>
         <a href="/querrymaker"><i class="bi bi-table"></i> Lekérdezés tervező</a>
         <a href="/managerequests"><i class="bi bi-person-gear"></i>Adatigények kezelése</a>
-        <a href="/upload"><i class="bi bi-cloud-arrow-up"></i>Tábla feltöltés</a>
+        <a href="/upload"><i class="bi bi-cloud-arrow-up"></i>Táblafeltöltés</a>
         <a href="/bugreport"><i class="bi bi-bug"></i>Hiba bejelentése</a>
         <a href="/help" target="_blank"><i class="bi bi-info-circle"></i>Súgó</a>
     </div>
 
         <!-- Left column: file upload form -->
         <div class="main-content">
-            <div class="title"><h2 style="font-weight: bold;">Tábla feltöltés (.xlsx)</h2></div>
+            <div class="title"><h2 style="font-weight: bold;">Táblafeltöltés (.xlsx)</h2></div>
             <div class="hero-container2">
             <form action="/uploadfile" method="POST" enctype="multipart/form-data">
-                <label for="customFileName">Írja be a tábla nevét:</label>
+                <label style="font-size: larger;" for="customFileName"><u>Írja be a tábla nevét</u>:</label>
                 <input type="text" id="customFileName" name="customFileName" placeholder="Tábla neve">
                 <br><br>
                 <input type="file" name="file" accept=".xlsx" required>

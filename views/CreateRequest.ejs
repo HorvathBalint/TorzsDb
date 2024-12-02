@@ -28,12 +28,12 @@
         <a href="/requestdata"><i class="bi bi-database-add"></i>Adatigénylés</a>
         <a href="/querrymaker"><i class="bi bi-table"></i> Lekérdezés tervező</a>
         <a href="/managerequests"><i class="bi bi-person-gear"></i>Adatigények kezelése</a>
-        <a href="/upload"><i class="bi bi-cloud-arrow-up"></i>Tábla feltöltés</a>
+        <a href="/upload"><i class="bi bi-cloud-arrow-up"></i>Táblafeltöltés</a>
         <a href="/bugreport"><i class="bi bi-bug"></i>Hiba bejelentése</a>
         <a href="/help" target="_blank"><i class="bi bi-info-circle"></i>Súgó</a>
     </div>
     <div class="main-content">
-    <div class="title"><h2 style="font-weight: bold;">Adat igénylés</h2></div>
+    <div class="title"><h2 style="font-weight: bold;">Adatigénylés</h2></div>
     <div class="hero-container2">
         <!-- Checkbox for each table -->
         <div style="align-items: center;" id="tableCheckboxes" class="mb-3">
@@ -101,7 +101,7 @@
     <% }); %>
 </div>
                         <div class="mb-3" style="margin-right:20px">
-                            <label for="description" class="form-label"><b>Leírás</b> (opcionális)</label>
+                            <label for="description" class="form-label"><b>Megjegyzés</b> (opcionális)</label>
                             <textarea class="form-control form-textarea" id="description" name="description" maxlength="65535"></textarea>
                         </div>
 
@@ -184,7 +184,7 @@
         .map(([table, columns]) => `Tábla: ${table}\nAdatok: ${columns.join(", ")}\n`)
         .join("\n");
 
-    const logContent = `${tableDataContent}\n<b>Leírás:</b>\n${description || "Nincs megadva."}`;
+    const logContent = `${tableDataContent}\n<b>Megjegyzés:</b>\n${description || "Nincs megadva."}`;
 
     // Generate a timestamp for the file name
     const now = new Date();
