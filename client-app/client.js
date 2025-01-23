@@ -21,7 +21,7 @@ app.get('/', (req, res) => {
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Tantárgyweb</title>
         <style>
-          body { font-family: Arial, sans-serif; text-align: center; }
+          body { font-family: Arial, sans-serif; text-align: left; }
           table { width: 80%; margin: 20px auto; border-collapse: collapse; }
           table, th, td { border: 1px solid #ddd; }
           th, td { padding: 8px; text-align: left; }

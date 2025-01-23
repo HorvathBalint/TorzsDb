@@ -84,12 +84,12 @@
     "email": "E-mail",
     "student_status": "Hallgatói státusz"
 };
-        async function loadRequests() {
-    const response = await fetch('/list-requests');
-    if (!response.ok) {
-        alert("Failed to load requests.");
-        return;
-    }
+    async function loadRequests() {
+        const response = await fetch('/list-requests');
+        if (!response.ok) {
+            alert("Failed to load requests.");
+            return;
+        }
 
     const requests = await response.json(); // Array of { fileName, content }
     const container = document.getElementById('requestsContainer');
@@ -113,6 +113,8 @@
         requestDiv.innerHTML = `
         <div class="table-section" style="margin-right:20px; font-size:larger;">
             <p><strong>${fileName}</strong></p>
+            
+            <p><strong>Igénylő fél:</strong> Horváth Bálint - D5YIMK</p><hr>
             <pre><strong>Igényelt adatok:</strong>\n${translatedContent}</pre>
             <button class="btn btn-success" onclick="reactToRequest('${fileName}', 'accepted')">Elfogad</button>
             <span style="padding: 15px"></span>
